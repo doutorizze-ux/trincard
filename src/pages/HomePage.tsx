@@ -232,7 +232,9 @@ export default function HomePage() {
 
                     <div className="mb-10 flex items-baseline gap-1">
                       <span className="text-gray-400 font-bold text-lg">R$</span>
-                      <span className="text-6xl font-black text-white italic tracking-tighter">{Number(plan.price).toFixed(0)}</span>
+                      <span className="text-6xl font-black text-white italic tracking-tighter">
+                        {Number(plan.price).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                      </span>
                       <span className="text-gray-500 font-bold text-lg">/mês</span>
                     </div>
 
