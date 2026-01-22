@@ -148,10 +148,11 @@ export default function PartnerForm({
               type="text"
               value={formData.company_name}
               onChange={(e) => handleInputChange('company_name', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black ${errors.company_name ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 ${errors.company_name ? 'border-red-500' : 'border-gray-300'
                 }`}
               placeholder="Digite o nome da empresa"
               disabled={loading}
+              onClick={(e) => e.stopPropagation()}
             />
             {errors.company_name && (
               <p className="text-red-500 text-sm mt-1">{errors.company_name}</p>
@@ -172,10 +173,11 @@ export default function PartnerForm({
                 step="0.01"
                 value={formData.percentage}
                 onChange={(e) => handleInputChange('percentage', parseFloat(e.target.value) || 0)}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.percentage ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 ${errors.percentage ? 'border-red-500' : 'border-gray-300'
                   }`}
                 placeholder="0.00"
                 disabled={loading}
+                onClick={(e) => e.stopPropagation()}
               />
               <span className="absolute right-3 top-2 text-gray-500">%</span>
             </div>
@@ -194,10 +196,11 @@ export default function PartnerForm({
               type="email"
               value={formData.contact_email}
               onChange={(e) => handleInputChange('contact_email', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.contact_email ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 ${errors.contact_email ? 'border-red-500' : 'border-gray-300'
                 }`}
               placeholder="contato@empresa.com"
               disabled={loading}
+              onClick={(e) => e.stopPropagation()}
             />
             {errors.contact_email && (
               <p className="text-red-500 text-sm mt-1">{errors.contact_email}</p>
@@ -214,10 +217,11 @@ export default function PartnerForm({
               type="tel"
               value={formData.contact_phone}
               onChange={(e) => handleInputChange('contact_phone', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.contact_phone ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 ${errors.contact_phone ? 'border-red-500' : 'border-gray-300'
                 }`}
               placeholder="(11) 99999-9999"
               disabled={loading}
+              onClick={(e) => e.stopPropagation()}
             />
             {errors.contact_phone && (
               <p className="text-red-500 text-sm mt-1">{errors.contact_phone}</p>
@@ -232,8 +236,9 @@ export default function PartnerForm({
             <select
               value={formData.approval_status}
               onChange={(e) => handleInputChange('approval_status', e.target.value as any)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
               disabled={loading}
+              onClick={(e) => e.stopPropagation()}
             >
               <option value="pending_documentation">Pendente Documentação</option>
               <option value="approved">Aprovado</option>
@@ -264,9 +269,10 @@ export default function PartnerForm({
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
               placeholder="Observações sobre o parceiro..."
               disabled={loading}
+              onClick={(e) => e.stopPropagation()}
             />
           </div>
 

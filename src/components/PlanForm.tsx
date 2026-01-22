@@ -193,9 +193,10 @@ export default function PlanForm({
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => handleInputChange('name', e.target.value)}
-                                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                                 placeholder="Ex: TrinCard VIP"
                                 disabled={loading}
+                                onClick={(e) => e.stopPropagation()}
                             />
                             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                         </div>
@@ -211,9 +212,10 @@ export default function PlanForm({
                                 step="0.01"
                                 value={formData.price}
                                 onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
-                                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black ${errors.price ? 'border-red-500' : 'border-gray-300'}`}
+                                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 ${errors.price ? 'border-red-500' : 'border-gray-300'}`}
                                 placeholder="0.00"
                                 disabled={loading}
+                                onClick={(e) => e.stopPropagation()}
                             />
                             {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
                         </div>
@@ -228,16 +230,17 @@ export default function PlanForm({
                             value={formData.description}
                             onChange={(e) => handleInputChange('description', e.target.value)}
                             rows={3}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
                             placeholder="Descreva o plano..."
                             disabled={loading}
+                            onClick={(e) => e.stopPropagation()}
                         />
                     </div>
 
                     <div className="space-y-4">
                         <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Recursos (Flags)</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <label className="flex items-center space-x-3 cursor-pointer">
+                            <label className="flex items-center space-x-3 cursor-pointer" onClick={(e) => e.stopPropagation()}>
                                 <input
                                     type="checkbox"
                                     checked={formData.features.physical_card}
@@ -246,7 +249,7 @@ export default function PlanForm({
                                 />
                                 <span className="text-sm text-gray-700">Cartão Físico</span>
                             </label>
-                            <label className="flex items-center space-x-3 cursor-pointer">
+                            <label className="flex items-center space-x-3 cursor-pointer" onClick={(e) => e.stopPropagation()}>
                                 <input
                                     type="checkbox"
                                     checked={formData.features.priority_support}
@@ -255,7 +258,7 @@ export default function PlanForm({
                                 />
                                 <span className="text-sm text-gray-700">Suporte Prioritário</span>
                             </label>
-                            <label className="flex items-center space-x-3 cursor-pointer">
+                            <label className="flex items-center space-x-3 cursor-pointer" onClick={(e) => e.stopPropagation()}>
                                 <input
                                     type="checkbox"
                                     checked={formData.features.exclusive_benefits}
@@ -270,8 +273,9 @@ export default function PlanForm({
                                     type="number"
                                     value={formData.features.max_benefits}
                                     onChange={(e) => handleMaxBenefitsChange(parseInt(e.target.value) || 0)}
-                                    className="w-20 px-2 py-1 border border-gray-300 rounded-md text-black"
+                                    className="w-20 px-2 py-1 border border-gray-300 rounded-md bg-white text-gray-900"
                                     title="-1 para ilimitado"
+                                    onClick={(e) => e.stopPropagation()}
                                 />
                                 <span className="text-xs text-gray-500">(-1 = ilimitado)</span>
                             </div>
@@ -287,8 +291,9 @@ export default function PlanForm({
                                 value={newFeature}
                                 onChange={(e) => setNewFeature(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeatureItem())}
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
                                 placeholder="Ex: Acesso a todas as academias"
+                                onClick={(e) => e.stopPropagation()}
                             />
                             <button
                                 type="button"
