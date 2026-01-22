@@ -1,0 +1,119 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+serve(async (req) => {
+    // Handle CORS
+    if (req.method === 'OPTIONS') {
+        return new Response('ok', { headers: corsHeaders })
+    }
+
+    try {
+        const { planId, price, title, userEmail, name, cpfCnpj, frontendUrl } = await req.json()
+
+        // 1. Configuração do ASAAS
+        // HARDCODED TEMPORARIAMENTE PARA TESTE (O secret está demorando a propagar)
+        const ASAAS_API_KEY = '$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmMxNmU4NWY2LTVhNjEtNGYyYS05OTdjLWIzNGM5Yjk3ZDBjMzo6JGFhY2hfZGExOTkyOTMtNzY1Yy00YWUwLTg5MGItNmFkYzY1NWY3ZDMx';
+        const ASAAS_URL = 'https://sandbox.asaas.com/api/v3';
+
+        if (!ASAAS_API_KEY) {
+            throw new Error("ASAAS_API_KEY não configurada.");
+        }
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'access_token': ASAAS_API_KEY
+        };
+
+        // 2. Buscar ou Criar Cliente no Asaas
+        let customerId = '';
+
+        // Tenta buscar por email
+        const customerSearch = await fetch(`${ASAAS_URL}/customers?email=${userEmail}`, { headers });
+        const customerData = await customerSearch.json();
+
+        if (customerData.data && customerData.data.length > 0) {
+            customerId = customerData.data[0].id;
+        } else {
+            // Cria novo cliente
+            // Limpa CPF (apenas numeros)
+            const cleanCpf = cpfCnpj ? cpfCnpj.replace(/\D/g, '') : '';
+
+            const newCustomerRes = await fetch(`${ASAAS_URL}/customers`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    name: name || 'Novo Cliente',
+                    email: userEmail,
+                    cpfCnpj: cleanCpf,
+                    notificationDisabled: false // Permitir que Asaas envie email/zap
+                })
+            });
+            const newCustomer = await newCustomerRes.json();
+
+            if (newCustomer.errors) {
+                throw new Error(`Erro criando cliente Asaas: ${JSON.stringify(newCustomer.errors)}`);
+            }
+            customerId = newCustomer.id;
+        }
+
+        // 3. Criar Assinatura
+        const subscriptionPayload = {
+            customer: customerId,
+            billingType: "UNDEFINED", // Deixa o usuario escolher (Pix/Boleto/Cartao) no checkout
+            value: Number(price),
+            nextDueDate: new Date().toISOString().split('T')[0], // Hoje, para habilitar Pix imediato
+            cycle: "MONTHLY",
+            description: title,
+            externalReference: planId
+        };
+
+        const subRes = await fetch(`${ASAAS_URL}/subscriptions`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(subscriptionPayload)
+        });
+
+        const subData = await subRes.json();
+
+        if (subData.errors) {
+            throw new Error(`Erro criando assinatura Asaas: ${JSON.stringify(subData.errors)}`);
+        }
+
+        // 4. Buscar o Link de Pagamento da primeira cobrança dessa assinatura
+        // A assinatura em si não tem "invoiceUrl", as "cobranças" dela tem.
+        const paymentsRes = await fetch(`${ASAAS_URL}/subscriptions/${subData.id}/payments`, { headers });
+        const paymentsData = await paymentsRes.json();
+
+        let paymentUrl = '';
+        if (paymentsData.data && paymentsData.data.length > 0) {
+            // Pega o invoiceUrl da primeira cobrança pendente
+            paymentUrl = paymentsData.data[0].invoiceUrl;
+        } else {
+            // Fallback: Talvez demore uns ms para criar a cobrança?
+            // Se falhar, retornamos o ID e o front tenta lidar, mas ideal é o link.
+            throw new Error("Assinatura criada, mas cobrança não encontrada imediatamente.");
+        }
+
+        // Sucesso! Retorna o link para o frontend redirecionar
+        const responseData = {
+            init_point: paymentUrl, // Mantendo a estrutura 'init_point' para não quebrar o frontend q ja espera isso
+            subscription_id: subData.id
+        };
+
+        return new Response(JSON.stringify(responseData), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200,
+        })
+
+    } catch (error) {
+        console.error(error)
+        return new Response(JSON.stringify({ error: error.message }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 400,
+        })
+    }
+})
