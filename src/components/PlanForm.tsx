@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, DollarSign, List, Check, X, Save, Plus, Trash2 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import { toast } from 'sonner';
 
 interface PlanFeatures {
@@ -144,19 +144,10 @@ export default function PlanForm({
 
         try {
             if (isEditing && plan?.id) {
-                const { error } = await supabase
-                    .from('plans')
-                    .update(formData)
-                    .eq('id', plan.id);
-
-                if (error) throw error;
+                await api.plans.update(plan.id, formData);
                 toast.success('Plano atualizado com sucesso!');
             } else {
-                const { error } = await supabase
-                    .from('plans')
-                    .insert([formData]);
-
-                if (error) throw error;
+                await api.plans.create(formData);
                 toast.success('Plano criado com sucesso!');
             }
 

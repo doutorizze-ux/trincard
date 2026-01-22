@@ -23,7 +23,7 @@ import {
   AlertTriangle,
   DollarSign
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import { User as AppUser, Partner, Subscription, Plan } from '../lib/supabase';
 import { toast } from 'sonner';
 import { PartnerCard, UserCard, SubscriptionCard, StatsCard } from '../components/MemoizedComponents';
@@ -79,80 +79,13 @@ export default function AdminPage() {
       setLoading(true);
       setLastFetch(Date.now());
 
-      // Fetch all data in parallel for better performance
-      const [usersResult, partnersResult, subscriptionsResult, plansResult] = await Promise.allSettled([
-        supabase
-          .from('users')
-          .select('*')
-          .order('created_at', { ascending: false }),
-
-        supabase
-          .from('partners')
-          .select('*')
-          .order('created_at', { ascending: false }),
-
-        supabase
-          .from('subscriptions')
-          .select(`
-            *,
-            users (full_name, email),
-            plans (name, price)
-          `)
-          .order('created_at', { ascending: false }),
-
-        supabase
-          .from('plans')
-          .select('*')
-          .order('price', { ascending: true })
+      // Fetch all data in parallel
+      const [usersData, partnersData, subscriptionsData, plansData] = await Promise.all([
+        api.users.list().catch(() => []),
+        api.partners.list().catch(() => []),
+        api.subscriptions.list().catch(() => []),
+        api.plans.list().catch(() => [])
       ]);
-
-      // Handle users
-      let usersData = [];
-      if (usersResult.status === 'fulfilled') {
-        const { data, error } = usersResult.value;
-        if (error) {
-          console.error('Error fetching users:', error);
-          toast.error('Erro ao carregar usuários');
-        } else {
-          usersData = data || [];
-        }
-      }
-
-      // Handle partners
-      let partnersData = [];
-      if (partnersResult.status === 'fulfilled') {
-        const { data, error } = partnersResult.value;
-        if (error) {
-          console.error('Error fetching partners:', error);
-          toast.error('Erro ao carregar parceiros');
-        } else {
-          partnersData = data || [];
-        }
-      }
-
-      // Handle subscriptions
-      let subscriptionsData = [];
-      if (subscriptionsResult.status === 'fulfilled') {
-        const { data, error } = subscriptionsResult.value;
-        if (error) {
-          console.error('Error fetching subscriptions:', error);
-          toast.error('Erro ao carregar assinaturas');
-        } else {
-          subscriptionsData = data || [];
-        }
-      }
-
-      // Handle plans
-      let plansData = [];
-      if (plansResult.status === 'fulfilled') {
-        const { data, error } = plansResult.value;
-        if (error) {
-          console.error('Error fetching plans:', error);
-          toast.error('Erro ao carregar planos');
-        } else {
-          plansData = data || [];
-        }
-      }
 
       setUsers(usersData);
       setPartners(partnersData);
@@ -160,11 +93,11 @@ export default function AdminPage() {
       setPlans(plansData);
 
       // Calculate stats
-      const activeSubscriptions = subscriptionsData.filter(s => s.status === 'active').length;
-      const pendingPartners = partnersData.filter(p => p.approval_status === 'pending_documentation').length;
+      const activeSubscriptions = subscriptionsData.filter((s: Subscription) => s.status === 'active').length;
+      const pendingPartners = partnersData.filter((p: Partner) => p.approval_status === 'pending_documentation').length;
       const monthlyRevenue = subscriptionsData
-        .filter(s => s.status === 'active')
-        .reduce((sum, s) => sum + (s.plans?.price || 0), 0);
+        .filter((s: Subscription) => s.status === 'active')
+        .reduce((sum: number, s: Subscription) => sum + (s.plans?.price || 0), 0);
 
       setStats({
         totalUsers: usersData.length,
@@ -183,40 +116,26 @@ export default function AdminPage() {
 
   const handlePartnerStatusChange = useCallback(async (partnerId: string, newStatus: string) => {
     try {
-      const { error } = await supabase
-        .from('partners')
-        .update({
-          approval_status: newStatus,
-          approval_date: newStatus === 'approved' ? new Date().toISOString() : null
-        })
-        .eq('id', partnerId);
+      await api.partners.update(partnerId, {
+        approval_status: newStatus,
+        approval_date: newStatus === 'approved' ? new Date().toISOString() : null
+      });
 
-      if (error) {
-        toast.error('Erro ao atualizar status do parceiro');
-      } else {
-        toast.success('Status do parceiro atualizado com sucesso');
-        fetchData();
-      }
+      toast.success('Status do parceiro atualizado com sucesso');
+      fetchData();
     } catch (error) {
-      toast.error('Erro inesperado');
+      toast.error('Erro ao atualizar status do parceiro');
     }
   }, [fetchData]);
 
   const handlePlanStatusChange = useCallback(async (planId: string, isActive: boolean) => {
     try {
-      const { error } = await supabase
-        .from('plans')
-        .update({ is_active: isActive })
-        .eq('id', planId);
+      await api.plans.update(planId, { is_active: isActive });
 
-      if (error) {
-        toast.error('Erro ao atualizar status do plano');
-      } else {
-        toast.success('Status do plano atualizado com sucesso');
-        fetchData();
-      }
+      toast.success('Status do plano atualizado com sucesso');
+      fetchData();
     } catch (error) {
-      toast.error('Erro inesperado');
+      toast.error('Erro ao atualizar status do plano');
     }
   }, [fetchData]);
 
@@ -234,19 +153,12 @@ export default function AdminPage() {
     setDeletingPartnerId(partnerId);
 
     try {
-      const { error } = await supabase
-        .from('partners')
-        .delete()
-        .eq('id', partnerId);
+      await api.partners.delete(partnerId);
 
-      if (error) {
-        toast.error(`Erro ao excluir parceiro: ${error.message}`);
-      } else {
-        toast.success('Parceiro excluído com sucesso');
-        fetchData();
-      }
-    } catch (error) {
-      toast.error(`Erro inesperado: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      toast.success('Parceiro excluído com sucesso');
+      fetchData();
+    } catch (error: any) {
+      toast.error(`Erro ao excluir parceiro: ${error.message || 'Erro desconhecido'}`);
     } finally {
       setDeletingPartnerId(null);
     }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, Percent, Mail, Phone, FileText, Save, X } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 import FileUpload from './FileUpload';
 import { toast } from 'sonner';
 
@@ -26,6 +27,7 @@ export default function PartnerForm({
   onCancel,
   partner
 }: PartnerFormProps) {
+  const { user } = useAuth();
   const isEditing = !!partner;
 
   // Inicializa o estado DIRETAMENTE dos props (já que usamos key prop no pai)
@@ -43,46 +45,28 @@ export default function PartnerForm({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Não precisamos mais do useEffect complexo aqui pois o componente remonta a cada edição
+  // ... (validateForm and other handlers remain same)
 
   const validateForm = (): boolean => {
+    // ... validate logic (copy from file or leave as is if I can skip valid lines?)
+    // Actually I need to include validateForm to be safe with replace block or use multi-edit.
+    // I will replace from start of function.
     const newErrors: Record<string, string> = {};
-
-    if (!formData.company_name.trim()) {
-      newErrors.company_name = 'Nome da empresa é obrigatório';
-    }
-
-    if (formData.percentage < 0 || formData.percentage > 100) {
-      newErrors.percentage = 'Porcentagem deve estar entre 0 e 100';
-    }
-
-    if (formData.contact_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contact_email)) {
-      newErrors.contact_email = 'Email inválido';
-    }
-
-    if (formData.contact_phone && !/^[\d\s\(\)\+\-]+$/.test(formData.contact_phone)) {
-      newErrors.contact_phone = 'Telefone inválido';
-    }
-
+    if (!formData.company_name.trim()) newErrors.company_name = 'Nome da empresa é obrigatório';
+    if (formData.percentage < 0 || formData.percentage > 100) newErrors.percentage = 'Porcentagem deve estar entre 0 e 100';
+    if (formData.contact_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contact_email)) newErrors.contact_email = 'Email inválido';
+    if (formData.contact_phone && !/^[\d\s\(\)\+\-]+$/.test(formData.contact_phone)) newErrors.contact_phone = 'Telefone inválido';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleInputChange = (field: keyof PartnerFormData, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-
-    // Limpar erro do campo quando o usuário começar a digitar
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
   };
 
   const handleFileUpload = (url: string) => {
-    setFormData(prev => ({
-      ...prev,
-      contract_url: url,
-      document_status: 'uploaded'
-    }));
+    setFormData(prev => ({ ...prev, contract_url: url, document_status: 'uploaded' }));
     toast.success('Contrato enviado com sucesso!');
   };
 
@@ -91,11 +75,7 @@ export default function PartnerForm({
   };
 
   const handleRemoveFile = () => {
-    setFormData(prev => ({
-      ...prev,
-      contract_url: '',
-      document_status: 'missing'
-    }));
+    setFormData(prev => ({ ...prev, contract_url: '', document_status: 'missing' }));
     toast.info('Contrato removido');
   };
 
@@ -116,24 +96,13 @@ export default function PartnerForm({
       };
 
       if (isEditing && partner?.id) {
-        // Atualizar parceiro existente
-        const { error } = await supabase
-          .from('partners')
-          .update(dataToSave)
-          .eq('id', partner.id);
-
-        if (error) throw error;
+        await api.partners.update(partner.id, dataToSave);
         toast.success('Parceiro atualizado com sucesso!');
       } else {
-        // Criar novo parceiro
-        const { error } = await supabase
-          .from('partners')
-          .insert([{
-            ...dataToSave,
-            created_by: (await supabase.auth.getUser()).data.user?.id
-          }]);
-
-        if (error) throw error;
+        await api.partners.create({
+          ...dataToSave,
+          created_by: user?.id
+        });
         toast.success('Parceiro cadastrado com sucesso!');
       }
 
