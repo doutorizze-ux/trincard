@@ -174,7 +174,7 @@ export default function PartnerForm({
               <Building2 className="h-4 w-4 inline mr-2" />
               Nome da Empresa *
             </label>
-            {console.log('Rendering input, formData.company_name:', formData.company_name)}
+            {/* Company Name Input */}
             <input
               type="text"
               value={formData.company_name}

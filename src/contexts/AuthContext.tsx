@@ -185,7 +185,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return { error: profileError };
         }
 
-        setUserProfile(profileData);
+        setUserProfile(profileData as any);
         lastFetchedUserId.current = data.user.id;
       }
 
