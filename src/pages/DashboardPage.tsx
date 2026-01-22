@@ -109,6 +109,32 @@ export default function DashboardPage() {
     }
   };
 
+  const handleCopyLink = async () => {
+    if (!subscription?.barcode) return;
+    const link = `${window.location.origin}/cartao/${subscription.barcode}`;
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(link);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = link;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+      }
+      toast.success('Link de verificação copiado!');
+    } catch (err) {
+      console.error('Falha ao copiar:', err);
+      toast.error('Erro ao copiar link');
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       month: 'long',
@@ -169,11 +195,7 @@ export default function DashboardPage() {
 
                   <div className="flex flex-wrap gap-4">
                     <button
-                      onClick={() => {
-                        const link = `${window.location.origin}/cartao/${subscription.barcode}`;
-                        navigator.clipboard.writeText(link);
-                        toast.success('Link de verificação copiado!');
-                      }}
+                      onClick={handleCopyLink}
                       className="flex items-center space-x-2 bg-white/5 border border-white/10 hover:border-[#BFFF00]/50 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all group"
                     >
                       <ExternalLink className="h-4 w-4 text-[#BFFF00] group-hover:scale-110 transition-transform" />

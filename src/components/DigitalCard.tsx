@@ -42,11 +42,15 @@ export default function DigitalCard({
                     </div>
 
                     {/* Crest / Logo */}
-                    <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center border-4 border-[#BFFF00] shadow-xl">
-                        <div className="flex flex-col items-center">
-                            <span className="text-black font-black text-xs leading-none">TAC</span>
-                            <Trophy className="h-6 w-6 text-black" />
-                        </div>
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center border-4 border-[#BFFF00] shadow-xl overflow-hidden">
+                        <img
+                            src="/logo-tac.png"
+                            alt="TAC Logo"
+                            className="w-full h-full object-contain p-1"
+                            onError={(e) => {
+                                e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/pt/2/2e/Trindade_Atl%C3%A9tico_Clube.png';
+                            }}
+                        />
                     </div>
                 </div>
 

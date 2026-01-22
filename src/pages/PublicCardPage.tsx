@@ -36,7 +36,7 @@ export default function PublicCardPage() {
         return new Date(dateString).toLocaleDateString('pt-BR', {
             month: 'long',
             year: 'numeric'
-        });
+        }).toUpperCase();
     };
 
     if (loading) {
