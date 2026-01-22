@@ -19,17 +19,16 @@ import {
   Trophy,
   Crown
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { Subscription, Benefit, BenefitUsage } from '../lib/supabase';
+import { api } from '../lib/api';
 import JsBarcode from 'jsbarcode';
 import QRCodeGenerator from '../components/QRCodeGenerator';
 
 export default function DashboardPage() {
   const { user, userProfile } = useAuth();
   const navigate = useNavigate();
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [benefits, setBenefits] = useState<Benefit[]>([]);
-  const [recentUsage, setRecentUsage] = useState<BenefitUsage[]>([]);
+  const [subscription, setSubscription] = useState<any | null>(null);
+  const [benefits, setBenefits] = useState<any[]>([]);
+  const [recentUsage, setRecentUsage] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [barcodeDataUrl, setBarcodeDataUrl] = useState<string>('');
   const [lastFetch, setLastFetch] = useState<number>(0);
@@ -41,77 +40,25 @@ export default function DashboardPage() {
       setLoading(true);
       setLastFetch(Date.now());
 
-      // Fetch all data in parallel for better performance
-      const [subscriptionResult, benefitsResult, usageResult] = await Promise.allSettled([
-        supabase
-          .from('subscriptions')
-          .select(`
-            *,
-            plans (
-              name,
-              description,
-              price
-            )
-          `)
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .maybeSingle(), // Use maybeSingle to avoid 406/error if not found
+      // Fetch subscription from our API
+      const subscriptionData = await api.subscriptions.me();
 
-        supabase
-          .from('benefits')
-          .select('*')
-          .eq('is_active', true)
-          .limit(6),
-
-        supabase
-          .from('benefit_usage')
-          .select(`
-            *,
-            benefits (
-              title,
-              description
-            )
-          `)
-          .eq('user_id', user.id)
-          .order('used_at', { ascending: false })
-          .limit(5)
-      ]);
-
-      // Handle subscription
-      if (subscriptionResult.status === 'fulfilled') {
-        const { data: subscriptionData, error: subError } = subscriptionResult.value;
-        if (subError) {
-          console.error('Error fetching subscription:', subError);
-        } else {
-          setSubscription(subscriptionData);
-          if (subscriptionData?.barcode) {
-            generateBarcode(subscriptionData.barcode);
-          }
+      if (subscriptionData) {
+        setSubscription(subscriptionData);
+        if (subscriptionData.barcode) {
+          generateBarcode(subscriptionData.barcode);
         }
+      } else {
+        setSubscription(null);
       }
 
-      // Handle benefits
-      if (benefitsResult.status === 'fulfilled') {
-        const { data: benefitsData, error: benefitsError } = benefitsResult.value;
-        if (benefitsError) {
-          console.error('Error fetching benefits:', benefitsError);
-        } else {
-          setBenefits(benefitsData || []);
-        }
-      }
-
-      // Handle usage
-      if (usageResult.status === 'fulfilled') {
-        const { data: usageData, error: usageError } = usageResult.value;
-        if (usageError) {
-          console.error('Error fetching usage:', usageError);
-        } else {
-          setRecentUsage(usageData || []);
-        }
-      }
+      // For now, benefits and usage from API are empty as we haven't implemented those endpoints yet
+      setBenefits([]);
+      setRecentUsage([]);
 
     } catch (error) {
       console.error('Error fetching user data:', error);
+      setSubscription(null);
     } finally {
       setLoading(false);
     }
@@ -326,7 +273,7 @@ export default function DashboardPage() {
               <div className="p-8">
                 {benefits.length > 0 ? (
                   <div className="space-y-4">
-                    {benefits.slice(0, 4).map((benefit: Benefit) => (
+                    {benefits.slice(0, 4).map((benefit: any) => (
                       <div key={benefit.id} className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5 hover:border-white/20 transition-all group">
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center text-[#BFFF00]">
