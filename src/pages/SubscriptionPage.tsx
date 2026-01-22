@@ -22,6 +22,7 @@ import {
   Crown,
   Trophy
 } from 'lucide-react';
+import { api } from '../lib/api';
 import { supabase } from '../lib/supabase';
 import { Plan, Subscription } from '../lib/supabase';
 import { toast } from 'sonner';
@@ -29,8 +30,8 @@ import { SkeletonCard } from '../components/Skeleton';
 
 export default function SubscriptionPage() {
   const { user, userProfile } = useAuth();
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [currentSubscription, setCurrentSubscription] = useState<Subscription | null>(null);
+  const [plans, setPlans] = useState<any[]>([]);
+  const [currentSubscription, setCurrentSubscription] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
@@ -42,14 +43,9 @@ export default function SubscriptionPage() {
   const fetchPlansOnly = async () => {
     try {
       setLoadingPlans(true);
-      const { data, error } = await supabase
-        .from('plans')
-        .select('*')
-        .eq('is_active', true)
-        .order('price', { ascending: true });
-
-      if (error) throw error;
-      setPlans(data || []);
+      const data = await api.plans.list();
+      const activePlans = data.filter((p: any) => p.is_active).sort((a: any, b: any) => a.price - b.price);
+      setPlans(activePlans || []);
     } catch (error) {
       console.error('Erro ao buscar planos:', error);
       toast.error('Erro ao carregar planos');
@@ -59,20 +55,18 @@ export default function SubscriptionPage() {
   };
 
   const fetchSubscriptionOnly = async () => {
-    if (!userProfile?.id) return;
+    if (!user) return; // userProfile might be null initially? Use user from context
 
     try {
-      const { data: subscriptionData, error: subscriptionError } = await supabase
-        .from('subscriptions')
-        .select(`*, plans (*)`)
-        .eq('user_id', userProfile.id)
-        .eq('status', 'active')
-        .maybeSingle();
+      const subscriptionData = await api.subscriptions.me();
 
-      if (subscriptionError) {
-        console.error('Error fetching subscription:', subscriptionError);
-      } else {
+      if (subscriptionData) {
+        // Map backend response to frontend expected format if needed
+        // Backend returns joined fields, frontend expects 'plans' object nested?
+        // My query: json_build_object('name', p.name...) AS plans
         setCurrentSubscription(subscriptionData);
+      } else {
+        setCurrentSubscription(null);
       }
     } catch (error) {
       console.error('Error in fetchSubscriptionOnly:', error);
@@ -344,10 +338,10 @@ export default function SubscriptionPage() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                   {plans.map((plan) => {
-                    const features = Array.isArray(plan.features) ? plan.features : [];
+                    const featuresList = plan.features?.features || [];
                     const planName = plan.name || '';
-                    const isPopular = planName.toLowerCase().includes('premium');
-                    const planPrice = plan.price || 0;
+                    const isPopular = plan.features?.exclusive_benefits || planName.toLowerCase().includes('premium');
+                    const planPrice = Number(plan.price) || 0;
 
                     return (
                       <div
@@ -388,7 +382,7 @@ export default function SubscriptionPage() {
                           </div>
 
                           <div className="space-y-4 mb-10 flex-1">
-                            {features.map((feature: any, idx: number) => (
+                            {featuresList.map((feature: any, idx: number) => (
                               <div key={idx} className="flex items-center space-x-3">
                                 <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${isPopular ? 'bg-[#BFFF00]' : 'bg-white/10'}`}>
                                   <CheckCircle className={`h-3 w-3 ${isPopular ? 'text-black' : 'text-gray-400'}`} />
@@ -396,6 +390,9 @@ export default function SubscriptionPage() {
                                 <span className="text-sm font-bold text-gray-400 uppercase tracking-tight">{typeof feature === 'string' ? feature : String(feature)}</span>
                               </div>
                             ))}
+                            {featuresList.length === 0 && (
+                              <p className="text-gray-600 text-sm italic">Sem detalhes adicionais</p>
+                            )}
                           </div>
 
                           <button

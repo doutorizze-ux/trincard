@@ -43,5 +43,6 @@ export const api = {
     },
     subscriptions: {
         list: () => request('/subscriptions'),
+        me: () => request('/subscriptions/me'),
     }
 };
