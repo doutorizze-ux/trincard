@@ -41,7 +41,15 @@ export const getUserSubscription = async (req: Request, res: Response) => {
 
 export const activateFreeSubscription = async (req: Request, res: Response) => {
     const { planId } = req.body;
-    const userId = (req as any).user.id;
+    const userId = (req as any).user?.id;
+
+    if (!userId) {
+        return res.status(401).json({ error: 'Usuário não autenticado' });
+    }
+
+    if (!planId) {
+        return res.status(400).json({ error: 'ID do plano é obrigatório' });
+    }
 
     try {
         const planResult = await pool.query('SELECT * FROM plans WHERE id = $1', [planId]);
@@ -54,29 +62,52 @@ export const activateFreeSubscription = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Este plano não é gratuito. Use o checkout normal.' });
         }
 
-        const subCheck = await pool.query(
-            "SELECT id FROM subscriptions WHERE user_id = $1 AND status = 'active'",
+        // Deletar ou cancelar assinaturas ativas anteriores
+        await pool.query(
+            "UPDATE subscriptions SET status = 'cancelled', updated_at = NOW() WHERE user_id = $1 AND status = 'active'",
             [userId]
         );
-        if (subCheck.rows.length > 0) {
-            await pool.query("UPDATE subscriptions SET status = 'cancelled' WHERE user_id = $1 AND status = 'active'", [userId]);
-        }
 
-        const startDate = new Date();
+        const startDate = new Date().toISOString();
         const endDate = new Date();
-        endDate.setDate(startDate.getDate() + 30);
+        endDate.setDate(endDate.getDate() + 30);
+        const endDateIso = endDate.toISOString();
 
-        const insertResult = await pool.query(
-            `INSERT INTO subscriptions (user_id, plan_id, status, start_date, end_date, price_paid)
-             VALUES ($1, $2, 'active', $3, $4, 0)
-             RETURNING *`,
-            [userId, planId, startDate, endDate]
-        );
+        const insertQuery = `
+            INSERT INTO subscriptions (
+                user_id, 
+                plan_id, 
+                status, 
+                start_date, 
+                end_date, 
+                price_paid,
+                created_at,
+                updated_at
+            )
+            VALUES ($1, $2, 'active', $3, $4, 0.00, NOW(), NOW())
+            RETURNING *
+        `;
 
+        const insertResult = await pool.query(insertQuery, [
+            userId,
+            planId,
+            startDate,
+            endDateIso
+        ]);
+
+        console.log(`Plano gratuito ativado para o usuário ${userId}`);
         res.status(201).json(insertResult.rows[0]);
 
-    } catch (error) {
-        console.error('Erro ao ativar plano gratuito:', error);
-        res.status(500).json({ error: 'Erro interno ao ativar plano' });
+    } catch (error: any) {
+        console.error('ERRO CRÍTICO AO ATIVAR PLANO GRATUITO:', {
+            message: error.message,
+            stack: error.stack,
+            userId,
+            planId
+        });
+        res.status(500).json({
+            error: 'Erro interno ao ativar plano',
+            details: error.message
+        });
     }
 };
