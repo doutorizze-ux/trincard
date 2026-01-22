@@ -73,24 +73,30 @@ export const activateFreeSubscription = async (req: Request, res: Response) => {
         endDate.setDate(endDate.getDate() + 30);
         const endDateIso = endDate.toISOString();
 
+        // Gerar um código de barras aleatório de 12 dígitos
+        const barcode = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+
         const insertQuery = `
             INSERT INTO subscriptions (
                 user_id, 
                 plan_id, 
                 status, 
+                barcode,
+                due_date,
                 start_date, 
-                end_date, 
-                price_paid,
+                end_date,
                 created_at,
                 updated_at
             )
-            VALUES ($1, $2, 'active', $3, $4, 0.00, NOW(), NOW())
+            VALUES ($1, $2, 'active', $3, $4, $5, $6, NOW(), NOW())
             RETURNING *
         `;
 
         const insertResult = await pool.query(insertQuery, [
             userId,
             planId,
+            barcode,
+            endDateIso,
             startDate,
             endDateIso
         ]);
