@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/Layout';
 import {
@@ -22,6 +22,8 @@ import {
 import { api } from '../lib/api';
 import JsBarcode from 'jsbarcode';
 import QRCodeGenerator from '../components/QRCodeGenerator';
+import DigitalCard from '../components/DigitalCard';
+import { toast } from 'sonner';
 
 export default function DashboardPage() {
   const { user, userProfile } = useAuth();
@@ -108,7 +110,10 @@ export default function DashboardPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      month: 'long',
+      year: 'numeric'
+    }).toUpperCase();
   };
 
   if (loading) {
@@ -151,46 +156,38 @@ export default function DashboardPage() {
             {/* Digital Card Hub */}
             <div className="lg:col-span-8">
               {subscription ? (
-                <div className="bg-zinc-900 border border-white/5 rounded-[40px] p-8 lg:p-10 shadow-2xl relative overflow-hidden group">
-                  {/* Card Background Graphics */}
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#BFFF00] opacity-5 blur-[80px] rounded-full -mr-20 -mt-20 group-hover:opacity-10 transition-opacity"></div>
-
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-                    <div>
-                      <h2 className="text-2xl font-black text-white italic tracking-tighter uppercase mb-2">TRINCARD DIGITAL</h2>
-                      <div className="flex items-center space-x-3">
-                        <span className="bg-[#BFFF00]/10 text-[#BFFF00] px-3 py-1 rounded-lg text-xs font-black uppercase tracking-widest border border-[#BFFF00]/20">
-                          {subscription.plans?.name}
-                        </span>
-                        <span className="flex items-center space-x-1 text-xs font-bold text-gray-500">
-                          <CheckCircle className="h-3 w-3 text-[#BFFF00]" />
-                          <span className="uppercase tracking-widest">Ativo</span>
-                        </span>
-                      </div>
-                    </div>
-                    <div className="w-16 h-16 bg-[#BFFF00] rounded-2xl flex items-center justify-center text-black transform hover:rotate-6 transition-transform">
-                      {getPlanIcon(subscription.plans?.name || '')}
-                    </div>
+                <div className="space-y-6">
+                  <div className="relative group">
+                    <DigitalCard
+                      userName={userProfile?.full_name || 'ATLETA'}
+                      planName={subscription.plans?.name || 'PLANO'}
+                      barcode={subscription.barcode}
+                      status={subscription.status}
+                      expiryDate={formatDate(subscription.end_date)}
+                    />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
-                    <div>
-                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Titular da Conta</p>
-                      <p className="text-xl font-black text-white italic tracking-tight uppercase">{userProfile?.full_name}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">Expiração do Ciclo</p>
-                      <p className="text-xl font-black text-white italic tracking-tight uppercase">{formatDate(subscription.end_date)}</p>
-                    </div>
-                  </div>
+                  <div className="flex flex-wrap gap-4">
+                    <button
+                      onClick={() => {
+                        const link = `${window.location.origin}/cartao/${subscription.barcode}`;
+                        navigator.clipboard.writeText(link);
+                        toast.success('Link de verificação copiado!');
+                      }}
+                      className="flex items-center space-x-2 bg-white/5 border border-white/10 hover:border-[#BFFF00]/50 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all group"
+                    >
+                      <ExternalLink className="h-4 w-4 text-[#BFFF00] group-hover:scale-110 transition-transform" />
+                      <span>COPIAR LINK P/ ESTABELECIMENTO</span>
+                    </button>
 
-                  {/* Barcode Section */}
-                  {barcodeDataUrl && (
-                    <div className="bg-white rounded-3xl p-6 flex flex-col items-center">
-                      <img src={barcodeDataUrl} alt="Barcode" className="max-w-full h-auto mb-4" />
-                      <p className="text-[10px] font-black text-black uppercase tracking-[0.2em]">IDENTIFICAÇÃO ELITE • {subscription.barcode}</p>
-                    </div>
-                  )}
+                    <Link
+                      to="/perfil"
+                      className="flex items-center space-x-2 bg-white/5 border border-white/10 hover:border-blue-500/50 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all group"
+                    >
+                      <Star className="h-4 w-4 text-blue-500 group-hover:scale-110 transition-transform" />
+                      <span>EDITAR DADOS</span>
+                    </Link>
+                  </div>
                 </div>
               ) : (
                 <div className="bg-zinc-900/50 backdrop-blur-xl border border-dashed border-white/10 rounded-[40px] p-12 text-center flex flex-col items-center justify-center min-h-[400px]">

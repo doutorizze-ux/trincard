@@ -15,6 +15,7 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const PartnersPage = lazy(() => import('./pages/PartnersPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
+const PublicCardPage = lazy(() => import('./pages/PublicCardPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/cadastro" element={<RegisterPage />} />
                 <Route path="/parceiros" element={<PartnersPage />} />
+                <Route path="/cartao/:barcode" element={<PublicCardPage />} />
 
                 {/* Protected Routes */}
                 <Route path="/dashboard" element={

@@ -12,6 +12,7 @@ import partnersRoutes from './routes/partners.js';
 import plansRoutes from './routes/plans.js';
 import usersRoutes from './routes/users.js';
 import subscriptionsRoutes from './routes/subscriptions.js';
+import publicRoutes from './routes/public.js';
 
 // for esm mode
 const __filename = fileURLToPath(import.meta.url);
@@ -35,6 +36,7 @@ app.use('/api/partners', partnersRoutes);
 app.use('/api/plans', plansRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/subscriptions', subscriptionsRoutes);
+app.use('/api/public', publicRoutes);
 
 /**
  * health
