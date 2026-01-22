@@ -133,6 +133,15 @@ export default function SubscriptionPage() {
       const plan = plans.find(p => p.id === selectedPlan);
       if (!plan) throw new Error('Plano não encontrado');
 
+      if (Number(plan.price) <= 0) {
+        await api.subscriptions.activateFree(plan.id);
+        toast.success('Plano gratuito ativado com sucesso!');
+        setProcessingPayment(false);
+        setShowPaymentModal(false);
+        fetchData();
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           planId: plan.id,
@@ -468,25 +477,36 @@ export default function SubscriptionPage() {
                 <div className="w-20 h-20 bg-[#BFFF00]/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
                   <Shield className="h-10 w-10 text-[#BFFF00]" />
                 </div>
-                <h4 className="text-lg font-black text-white uppercase tracking-widest mb-4 italic">CRIPTOGRAFIA DE GRAU MILITAR</h4>
-                <p className="text-gray-500 font-bold mb-8 text-sm">
-                  Você será redirecionado para o hub de pagamento seguro. Escolha sua arma:
-                </p>
+                {Number(plans.find(p => p.id === selectedPlan)?.price || 0) > 0 ? (
+                  <>
+                    <h4 className="text-lg font-black text-white uppercase tracking-widest mb-4 italic">CRIPTOGRAFIA DE GRAU MILITAR</h4>
+                    <p className="text-gray-500 font-bold mb-8 text-sm">
+                      Você será redirecionado para o hub de pagamento seguro. Escolha sua arma:
+                    </p>
 
-                <div className="grid grid-cols-3 gap-4 mb-10">
-                  <div className="flex flex-col items-center p-4 bg-black rounded-2xl border border-white/5">
-                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#BFFF00] mb-2 font-black italic">PX</div>
-                    <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">PIX FAST</span>
-                  </div>
-                  <div className="flex flex-col items-center p-4 bg-black rounded-2xl border border-white/5">
-                    <CreditCard className="w-8 h-8 text-blue-500 mb-2" />
-                    <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">CREDIT</span>
-                  </div>
-                  <div className="flex flex-col items-center p-4 bg-black rounded-2xl border border-white/5">
-                    <Smartphone className="w-8 h-8 text-purple-500 mb-2" />
-                    <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">E-WALLET</span>
-                  </div>
-                </div>
+                    <div className="grid grid-cols-3 gap-4 mb-10">
+                      <div className="flex flex-col items-center p-4 bg-black rounded-2xl border border-white/5">
+                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#BFFF00] mb-2 font-black italic">PX</div>
+                        <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">PIX FAST</span>
+                      </div>
+                      <div className="flex flex-col items-center p-4 bg-black rounded-2xl border border-white/5">
+                        <CreditCard className="w-8 h-8 text-blue-500 mb-2" />
+                        <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">CREDIT</span>
+                      </div>
+                      <div className="flex flex-col items-center p-4 bg-black rounded-2xl border border-white/5">
+                        <Smartphone className="w-8 h-8 text-purple-500 mb-2" />
+                        <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">E-WALLET</span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h4 className="text-lg font-black text-white uppercase tracking-widest mb-4 italic">PLANO 100% GRATUITO</h4>
+                    <p className="text-gray-500 font-bold mb-8 text-sm">
+                      Ative agora para começar a explorar os benefícios sem custo inicial.
+                    </p>
+                  </>
+                )}
               </div>
 
               <div className="flex flex-col gap-4">

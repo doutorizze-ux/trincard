@@ -44,5 +44,9 @@ export const api = {
     subscriptions: {
         list: () => request('/subscriptions'),
         me: () => request('/subscriptions/me'),
+        activateFree: (planId: string) => request('/subscriptions/activate-free', {
+            method: 'POST',
+            body: JSON.stringify({ planId })
+        }),
     }
 };
