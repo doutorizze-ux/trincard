@@ -13,11 +13,10 @@ import {
   Target,
   Activity
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { Plan } from '../lib/supabase';
+import { api } from '../lib/api';
 
 export default function HomePage() {
-  const [plans, setPlans] = useState<Plan[]>([]);
+  const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,17 +25,8 @@ export default function HomePage() {
 
   const fetchPlans = async () => {
     try {
-      const { data, error } = await supabase
-        .from('plans')
-        .select('*')
-        .eq('is_active', true)
-        .order('price');
-
-      if (error) {
-        console.error('Error fetching plans:', error);
-      } else {
-        setPlans(data || []);
-      }
+      const data = await api.plans.list();
+      setPlans(data.filter((p: any) => p.is_active));
     } catch (error) {
       console.error('Error fetching plans:', error);
     } finally {
@@ -71,14 +61,7 @@ export default function HomePage() {
     }
   ];
 
-  const benefits = [
-    'Descontos exclusivos em academias premium',
-    'Até 50% OFF em farmácias e drogarias',
-    'Consultas médicas e exames com preços especiais',
-    'Descontos em lojas de suplementos e artigos esportivos',
-    'Acesso a hospitais e clínicas parceiras',
-    'Plataforma de telemedicina inclusa'
-  ];
+
 
   return (
     <Layout>
@@ -235,8 +218,8 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {plans.map((plan) => (
                 <div key={plan.id} className="relative group perspective-1000">
-                  <div className={`h-full bg-zinc-900 rounded-[40px] p-10 border border-white/5 transition-all duration-500 ${plan.name === 'Premium' ? 'ring-4 ring-[#BFFF00] scale-105 z-10' : 'hover:border-white/20'}`}>
-                    {plan.name === 'Premium' && (
+                  <div className={`h-full bg-zinc-900 rounded-[40px] p-10 border border-white/5 transition-all duration-500 ${plan.features?.exclusive_benefits ? 'ring-4 ring-[#BFFF00] scale-105 z-10' : 'hover:border-white/20'}`}>
+                    {plan.features?.exclusive_benefits && (
                       <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-[#BFFF00] text-black px-6 py-1.5 rounded-full font-black uppercase text-xs tracking-widest shadow-[0_0_20px_rgba(191,255,0,0.5)]">
                         Mais Popular
                       </div>
@@ -249,12 +232,12 @@ export default function HomePage() {
 
                     <div className="mb-10 flex items-baseline gap-1">
                       <span className="text-gray-400 font-bold text-lg">R$</span>
-                      <span className="text-6xl font-black text-white italic tracking-tighter">{plan.price.toFixed(0)}</span>
+                      <span className="text-6xl font-black text-white italic tracking-tighter">{Number(plan.price).toFixed(0)}</span>
                       <span className="text-gray-500 font-bold text-lg">/mês</span>
                     </div>
 
                     <div className="space-y-4 mb-12">
-                      {benefits.slice(0, plan.name === 'Premium' ? 6 : plan.name === 'Plus' ? 4 : 3).map((benefit, index) => (
+                      {(plan.features?.features || []).map((benefit: string, index: number) => (
                         <div key={index} className="flex items-start space-x-3 group/item">
                           <div className="mt-1 p-0.5 rounded-full bg-[#BFFF00]/10 text-[#BFFF00]">
                             <CheckCircle className="h-4 w-4" />
@@ -262,11 +245,14 @@ export default function HomePage() {
                           <span className="text-gray-400 group-hover/item:text-white transition-colors text-sm font-bold">{benefit}</span>
                         </div>
                       ))}
+                      {(!plan.features?.features || plan.features.features.length === 0) && (
+                        <p className="text-gray-600 text-sm">Sem benefícios listados.</p>
+                      )}
                     </div>
 
                     <Link
                       to="/cadastro"
-                      className={`w-full py-5 rounded-2xl font-black italic uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${plan.name === 'Premium'
+                      className={`w-full py-5 rounded-2xl font-black italic uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${plan.features?.exclusive_benefits
                         ? 'bg-[#BFFF00] text-black hover:bg-white shadow-[0_0_20px_rgba(191,255,0,0.2)]'
                         : 'bg-white/5 text-white hover:bg-white hover:text-black border border-white/10'
                         }`}
