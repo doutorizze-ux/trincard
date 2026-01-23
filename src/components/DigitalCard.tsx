@@ -7,6 +7,7 @@ interface DigitalCardProps {
     barcode: string;
     status: string;
     expiryDate: string;
+    userPhoto?: string;
     isPublic?: boolean;
 }
 
@@ -16,6 +17,7 @@ export default function DigitalCard({
     barcode,
     status,
     expiryDate,
+    userPhoto,
     isPublic = false
 }: DigitalCardProps) {
     const isActive = status === 'active';
@@ -58,25 +60,42 @@ export default function DigitalCard({
                     </span>
                 </div>
 
-                {/* User Info Section */}
-                <div className="flex flex-col z-10">
-                    <span className="text-[0.5rem] md:text-[0.6rem] font-black uppercase tracking-widest opacity-60">Nome</span>
-                    <h4 className="text-xl md:text-2xl font-black uppercase italic tracking-tighter leading-tight mb-2 truncate max-w-[80%] pr-4">
-                        {userName}
-                    </h4>
+                {/* User Info Section with Photo */}
+                <div className="flex items-end space-x-4 z-10">
+                    {/* User Photo / Avatar */}
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-zinc-800/50 rounded-2xl border-2 border-white/20 overflow-hidden shrink-0 shadow-lg backdrop-blur-sm">
+                        {userPhoto ? (
+                            <img src={userPhoto} alt={userName} className="w-full h-full object-cover" />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                                <span className="text-white/20">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 md:w-14 md:h-14">
+                                        <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+                                    </svg>
+                                </span>
+                            </div>
+                        )}
+                    </div>
 
-                    <div className="flex space-x-4 md:space-x-8">
-                        <div className="flex flex-col">
-                            <span className="text-[0.5rem] md:text-[0.6rem] font-black uppercase tracking-widest opacity-60">Válido Até</span>
-                            <span className="text-[0.7rem] md:text-sm font-bold uppercase tracking-widest text-[#BFFF00]">
-                                {expiryDate}
-                            </span>
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-[0.5rem] md:text-[0.6rem] font-black uppercase tracking-widest opacity-60">Status</span>
-                            <span className={`text-[0.7rem] md:text-sm font-black uppercase tracking-widest ${isActive ? 'text-lime-400' : 'text-red-400'}`}>
-                                {isActive ? 'Ativo' : 'Inativo'}
-                            </span>
+                    <div className="flex flex-col flex-1 min-w-0">
+                        <span className="text-[0.5rem] md:text-[0.6rem] font-black uppercase tracking-widest opacity-60">Nome</span>
+                        <h4 className="text-xl md:text-2xl font-black uppercase italic tracking-tighter leading-tight mb-2 truncate pr-4">
+                            {userName}
+                        </h4>
+
+                        <div className="flex space-x-4 md:space-x-8">
+                            <div className="flex flex-col">
+                                <span className="text-[0.5rem] md:text-[0.6rem] font-black uppercase tracking-widest opacity-60">Válido Até</span>
+                                <span className="text-[0.7rem] md:text-sm font-bold uppercase tracking-widest text-[#BFFF00]">
+                                    {expiryDate}
+                                </span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[0.5rem] md:text-[0.6rem] font-black uppercase tracking-widest opacity-60">Status</span>
+                                <span className={`text-[0.7rem] md:text-sm font-black uppercase tracking-widest ${isActive ? 'text-lime-400' : 'text-red-400'}`}>
+                                    {isActive ? 'Ativo' : 'Inativo'}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>

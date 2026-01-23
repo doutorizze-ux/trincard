@@ -190,6 +190,7 @@ export default function DashboardPage() {
                       barcode={subscription.barcode}
                       status={subscription.status}
                       expiryDate={formatDate(subscription.end_date)}
+                      userPhoto={userProfile?.profile_photo_url}
                     />
                   </div>
 

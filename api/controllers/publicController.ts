@@ -16,6 +16,7 @@ export const getPublicCard = async (req: Request, res: Response) => {
                 s.status,
                 s.end_date,
                 u.full_name as user_name,
+                u.profile_photo_url,
                 p.name as plan_name
             FROM subscriptions s
             JOIN users u ON s.user_id = u.id

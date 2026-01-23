@@ -83,6 +83,7 @@ export default function PublicCardPage() {
                     barcode={data.barcode}
                     status={data.status}
                     expiryDate={formatDate(data.end_date)}
+                    userPhoto={data.profile_photo_url}
                     isPublic={true}
                 />
 

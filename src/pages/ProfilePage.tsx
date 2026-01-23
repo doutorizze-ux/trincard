@@ -153,6 +153,42 @@ export default function ProfilePage() {
     }
   };
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('A foto deve ter no máximo 2MB');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // Para este MVP, vamos converter para Base64 para demonstração rápida
+      // Em produção, isso deve ir para o Supabase Storage
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result as string;
+
+        const { error } = await supabase
+          .from('users')
+          .update({ profile_photo_url: base64String })
+          .eq('id', userProfile?.id);
+
+        if (error) throw error;
+
+        await updateProfile({ ...userProfile, profile_photo_url: base64String });
+        toast.success('Foto de perfil atualizada!');
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Photo upload error:', error);
+      toast.error('Erro ao enviar foto');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAccountDeletion = async () => {
     const confirmed = window.confirm(
       'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.'
@@ -193,14 +229,19 @@ export default function ProfilePage() {
 
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-10">
               <div className="relative group">
-                <div className="w-32 h-32 bg-zinc-800 rounded-3xl flex items-center justify-center border border-white/10 group-hover:border-[#FF3131]/40 transition-all overflow-hidden p-1">
-                  <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-900 rounded-2xl flex items-center justify-center">
-                    <User className="h-16 w-16 text-white/20 group-hover:text-[#FF3131] transition-colors" />
-                  </div>
+                <div className="w-32 h-32 bg-zinc-800 rounded-3xl flex items-center justify-center border border-white/10 group-hover:border-[#FF3131]/40 transition-all overflow-hidden">
+                  {userProfile?.profile_photo_url ? (
+                    <img src={userProfile.profile_photo_url} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-900 flex items-center justify-center">
+                      <User className="h-16 w-16 text-white/20 group-hover:text-[#FF3131] transition-colors" />
+                    </div>
+                  )}
                 </div>
-                <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#FF3131] text-black rounded-xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-xl">
+                <label className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#FF3131] text-black rounded-xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-xl cursor-pointer">
                   <Camera className="h-5 w-5" />
-                </button>
+                  <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={loading} />
+                </label>
               </div>
 
               <div className="flex-1 text-center md:text-left">
@@ -222,6 +263,15 @@ export default function ProfilePage() {
                     Desde 2024
                   </span>
                 </div>
+
+                {!userProfile?.profile_photo_url && (
+                  <div className="mt-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start space-x-3">
+                    <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                    <p className="text-[10px] font-bold text-amber-500 uppercase tracking-widest leading-relaxed">
+                      Atenção: Adicione uma foto de perfil para evitar fraudes e garantir sua identidade nos estabelecimentos parceiros.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
