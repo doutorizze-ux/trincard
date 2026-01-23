@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DigitalCard from '../components/DigitalCard';
-import { ShieldCheck, ShieldAlert, Clock, CheckCircle, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Clock, CheckCircle, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { api } from '../lib/api';
 
 export default function PublicCardPage() {
@@ -59,6 +59,8 @@ export default function PublicCardPage() {
     }
 
     const isActive = data.status === 'active';
+    const hasPhoto = !!data.profile_photo_url;
+    const isFullyValidated = isActive && hasPhoto;
 
     return (
         <div className="min-h-screen bg-black py-12 px-4 flex flex-col items-center justify-center">
@@ -88,12 +90,14 @@ export default function PublicCardPage() {
                 />
 
                 <div className="mt-12 w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className={`p-6 rounded-3xl border ${isActive ? 'bg-lime-500/10 border-lime-500/20 text-lime-400' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
+                    <div className={`p-6 rounded-3xl border ${isFullyValidated ? 'bg-lime-500/10 border-lime-500/20 text-lime-400' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
                         <div className="flex items-center space-x-4">
-                            {isActive ? <ShieldCheck className="h-8 w-8" /> : <ShieldAlert className="h-8 w-8" />}
+                            {isFullyValidated ? <ShieldCheck className="h-8 w-8" /> : <ShieldAlert className="h-8 w-8" />}
                             <div>
                                 <p className="text-[0.6rem] font-black uppercase tracking-widest opacity-60">Status de Validação</p>
-                                <p className="text-lg font-black uppercase italic tracking-tighter">{isActive ? 'VALIDADO E ATIVO' : 'ASSINATURA INATIVA'}</p>
+                                <p className="text-lg font-black uppercase italic tracking-tighter">
+                                    {isFullyValidated ? 'VALIDADO E ATIVO' : !hasPhoto ? 'IDENTIDADE NÃO VERIFICADA' : 'ASSINATURA INATIVA'}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -107,6 +111,17 @@ export default function PublicCardPage() {
                             </div>
                         </div>
                     </div>
+
+                    {!hasPhoto && (
+                        <div className="md:col-span-2 p-6 rounded-3xl bg-amber-500/10 border border-amber-500/20 text-amber-500 mt-4 flex items-start space-x-3">
+                            <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
+                            <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+                                AVISO AO ESTABELECIMENTO: Este cartão não possui foto de identificação.
+                                A aceitação deste cartão sem foto é de inteira responsabilidade do parceiro.
+                                <span className="block mt-2 text-white">O TITULAR DEVE ADICIONAR UMA FOTO NO PERFIL PARA REGULARIZAR.</span>
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-12 p-8 bg-white/5 rounded-[40px] border border-white/5 w-full">
