@@ -166,7 +166,7 @@ export default function DashboardPage() {
           {/* Header */}
           <div className="mb-12">
             <div className="flex items-center space-x-3 mb-4">
-              <span className="bg-[#FF3131] text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest italic animate-pulse">
+              <span className="bg-[#BFFF00] text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest italic animate-pulse">
                 Sessão Ativa
               </span>
             </div>
