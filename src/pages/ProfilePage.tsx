@@ -107,14 +107,10 @@ export default function ProfilePage() {
         card_type: profileData.card_type
       };
 
-      const { error } = await supabase
-        .from('users')
-        .update(updateData)
-        .eq('id', userProfile?.id);
+      const { error } = await updateProfile(updateData);
 
       if (error) throw error;
 
-      await updateProfile(updateData);
       setIsEditing(false);
       toast.success('Perfil atualizado com sucesso!');
     } catch (error) {
@@ -170,14 +166,10 @@ export default function ProfilePage() {
       reader.onloadend = async () => {
         const base64String = reader.result as string;
 
-        const { error } = await supabase
-          .from('users')
-          .update({ profile_photo_url: base64String })
-          .eq('id', userProfile?.id);
+        const { error } = await updateProfile({ profile_photo_url: base64String });
 
         if (error) throw error;
 
-        await updateProfile({ ...userProfile, profile_photo_url: base64String });
         toast.success('Foto de perfil atualizada!');
       };
       reader.readAsDataURL(file);

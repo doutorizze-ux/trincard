@@ -102,3 +102,34 @@ export const getMe = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export const updateMe = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user.id;
+        const { full_name, phone, address, profile_photo_url, card_type } = req.body;
+
+        const result = await pool.query(
+            `UPDATE users 
+             SET full_name = COALESCE($1, full_name),
+                 phone = COALESCE($2, phone),
+                 address = COALESCE($3, address),
+                 profile_photo_url = COALESCE($4, profile_photo_url),
+                 card_type = COALESCE($5, card_type),
+                 updated_at = NOW()
+             WHERE id = $6
+             RETURNING *`,
+            [full_name, phone, address, profile_photo_url, card_type, userId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const user = result.rows[0];
+        delete user.password_hash;
+        res.json(user);
+    } catch (error) {
+        console.error('Update user error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

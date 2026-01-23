@@ -139,9 +139,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const updateProfile = async (updates: Partial<AppUser>) => {
-        // TODO: Implement update profile API
-        // For now, minimal support
-        return { error: null };
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_URL}/auth/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(updates)
+            });
+
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+
+            // Sync local state
+            setUserProfile(data);
+            localStorage.setItem('user', JSON.stringify(data));
+            return { error: null };
+        } catch (error: any) {
+            console.error('Update profile failed', error);
+            return { error: { message: error.message || 'Update failed' } };
+        }
     };
 
     const value = {
