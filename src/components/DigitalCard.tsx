@@ -33,25 +33,11 @@ export default function DigitalCard({
                 {/* Header Section */}
                 <div className="flex justify-between items-start">
                     <div className="flex flex-col">
-                        <h3 className="text-[1rem] md:text-[1.2rem] font-black uppercase tracking-widest leading-none mb-1">
-                            CARTÃO AMIGOS DO <span className="text-[#BFFF00]">TACÃO</span>
-                        </h3>
-                        <p className="text-[0.6rem] md:text-[0.7rem] font-bold italic opacity-80 uppercase tracking-tighter">
-                            "JOGAMOS POR TODA UMA CIDADE"
-                        </p>
+                        <img src="/logo.png" alt="" className="h-10 md:h-12 w-auto object-contain" />
                     </div>
 
-                    {/* Crest / Logo */}
-                    <div className="w-14 h-14 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center border-4 border-[#BFFF00] shadow-xl overflow-hidden shrink-0">
-                        <img
-                            src="/logo-tac.png"
-                            alt="TAC Logo"
-                            className="w-full h-full object-contain p-1"
-                            onError={(e) => {
-                                e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/pt/2/2e/Trindade_Atl%C3%A9tico_Clube.png';
-                            }}
-                        />
-                    </div>
+                    {/* Empty div or spacer instead of old crest */}
+                    <div className="w-14 h-14 md:w-20 md:h-20 shrink-0 opacity-0 pointer-events-none"></div>
                 </div>
 
                 {/* Chip and Short ID */}
@@ -106,16 +92,16 @@ export default function DigitalCard({
                     <Trophy className="h-8 w-8 md:h-10 md:w-10 text-[#BFFF00] drop-shadow-lg" />
                 </div>
 
-                {/* TRINCARD watermark */}
+                {/*  watermark */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[4rem] md:text-[5rem] font-black italic text-white opacity-[0.02] md:opacity-[0.03] rotate-[-20deg] pointer-events-none select-none">
-                    TRINCARD
+                    
                 </div>
 
                 {!isPublic && (
                     <div className="absolute top-4 right-4">
                         <div className="flex items-center space-x-1 bg-black/20 backdrop-blur-sm px-2 py-1 rounded text-[0.6rem] font-black uppercase tracking-tighter border border-white/10">
                             <Zap className="h-3 w-3 text-[#BFFF00]" />
-                            <span>TRINCARD</span>
+                            <span></span>
                         </div>
                     </div>
                 )}

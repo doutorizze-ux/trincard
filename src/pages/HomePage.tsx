@@ -84,10 +84,9 @@ export default function HomePage() {
                 <Zap className="h-4 w-4 text-[#FF3131]" />
                 <span className="text-[#FF3131] text-xs font-black uppercase tracking-widest">Performance Máxima Ativada</span>
               </div>
-              <h1 className="text-5xl lg:text-8xl font-black text-white italic tracking-tighter leading-none mb-6">
-                DOMINE CADA <br />
-                <span className="text-[#FF3131] drop-shadow-[0_0_20px_rgba(191,255,0,0.5)]">MOVIMENTO</span>
-              </h1>
+              <div className="flex justify-center lg:justify-start mb-6">
+                <img src="/logo.png" alt="" className="h-16 lg:h-20 w-auto object-contain" />
+              </div>
               <p className="text-xl lg:text-2xl text-gray-400 font-bold mb-10 max-w-xl leading-relaxed">
                 O único cartão que une esporte, saúde e economia. Descontos reais em farmácias, hospitais, lojas e academias de elite.
               </p>
@@ -134,11 +133,7 @@ export default function HomePage() {
 
                   <div className="flex justify-between items-start relative z-10">
                     <div>
-                      <h3 className="text-white font-black italic text-4xl tracking-tighter leading-none">TRIN<span className="text-[#FF3131]">CARD</span></h3>
-                      <p className="text-[#FF3131] text-[10px] font-black uppercase tracking-[0.3em] mt-1">Elite Member</p>
-                    </div>
-                    <div className="w-16 h-12 bg-[#FF3131] rounded-lg flex items-center justify-center">
-                      <Zap className="text-black h-8 w-8" />
+                      <img src="/logo.png" alt="" className="h-10 w-auto object-contain" />
                     </div>
                   </div>
 

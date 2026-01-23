@@ -67,14 +67,8 @@ export function Layout({ children, showHeader = true, showFooter = true }: Layou
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-20">
               {/* Logo */}
-              <Link to="/" className="flex items-center space-x-3 group">
-                <div className="w-10 h-10 bg-[#FF3131] rounded-lg flex items-center justify-center transform group-hover:rotate-12 transition-transform shadow-[0_0_15px_rgba(191,255,0,0.3)]">
-                  <Trophy className="text-black h-6 w-6" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-2xl font-black text-white italic tracking-tighter leading-none">TRINCARD</span>
-                  <span className="text-[10px] text-[#FF3131] font-bold tracking-[0.2em] uppercase">Sport & Health Benefits</span>
-                </div>
+              <Link to="/" className="flex items-center group">
+                <img src="/logo.png" alt="" className="h-12 w-auto object-contain" />
               </Link>
 
               {/* Desktop Navigation */}
@@ -279,14 +273,8 @@ export function Layout({ children, showHeader = true, showFooter = true }: Layou
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-24">
               <div className="col-span-1 md:col-span-2">
-                <Link to="/" className="flex items-center space-x-3 mb-8 group">
-                  <div className="w-12 h-12 bg-[#FF3131] rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform shadow-[0_0_20px_rgba(191,255,0,0.4)]">
-                    <Trophy className="text-black h-7 w-7" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-3xl font-black text-white italic tracking-tighter leading-none">TRINCARD</span>
-                    <span className="text-xs text-[#FF3131] font-bold tracking-[0.3em] uppercase">Sport & Health Benefits</span>
-                  </div>
+                <Link to="/" className="flex items-center mb-8 group">
+                  <img src="/logo.png" alt="" className="h-16 w-auto object-contain" />
                 </Link>
                 <p className="text-gray-400 text-lg leading-relaxed mb-8 max-w-md">
                   A maior plataforma de benefícios do Brasil. Conectando você à saúde e ao alto desempenho através de redes exclusivas em farmácias, hospitais e academias.

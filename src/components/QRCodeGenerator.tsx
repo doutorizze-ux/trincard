@@ -38,7 +38,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ userProfile, subscrip
       const qrCodeData: QRCodeData = {
         userId: userProfile.id,
         subscriptionId: subscription.id,
-        planName: subscription.plan?.name || 'TrinCard',
+        planName: subscription.plan?.name || '',
         expirationDate: expirationDate.toISOString(),
         generatedAt: now.toISOString(),
         barcode: subscription.barcode
@@ -76,7 +76,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ userProfile, subscrip
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           
           const link = document.createElement('a');
-          link.download = `trincard-qr-${Date.now()}.png`;
+          link.download = `-qr-${Date.now()}.png`;
           link.href = canvas.toDataURL();
           link.click();
           

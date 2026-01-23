@@ -606,15 +606,10 @@ export default function RegisterPage() {
           </Link>
 
           <div className="flex justify-center mb-8">
-            <div className="w-20 h-20 bg-[#FF3131] rounded-3xl flex items-center justify-center shadow-[0_0_30px_rgba(191,255,0,0.3)] transform rotate-3 hover:rotate-6 transition-transform">
-              <Zap className="text-black h-10 w-10 fill-current" />
-            </div>
+            <img src="/logo.png" alt="" className="h-24 w-auto object-contain" />
           </div>
 
-          <h1 className="text-5xl lg:text-7xl font-black text-white italic tracking-tighter uppercase leading-none mb-6">
-            LIGA <span className="text-[#FF3131]">TRINCARD</span>
-          </h1>
-          <p className="text-base text-gray-500 font-bold uppercase tracking-[0.2em]">
+          <p className="text-base text-gray-500 font-bold uppercase tracking-[0.2em] mt-8">
             Prepare-se para o próximo nível
           </p>
         </div>
@@ -627,10 +622,10 @@ export default function RegisterPage() {
               <React.Fragment key={step}>
                 <div className="flex flex-col items-center group cursor-pointer" onClick={() => step < currentStep && setCurrentStep(step)}>
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all ${step === currentStep
-                      ? 'bg-[#FF3131] text-black shadow-[0_0_20px_rgba(191,255,0,0.4)] scale-110'
-                      : step < currentStep
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-black text-gray-700 border border-white/5'
+                    ? 'bg-[#FF3131] text-black shadow-[0_0_20px_rgba(191,255,0,0.4)] scale-110'
+                    : step < currentStep
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-black text-gray-700 border border-white/5'
                     }`}>
                     {step < currentStep ? <CheckCircle className="h-5 w-5" /> : step}
                   </div>

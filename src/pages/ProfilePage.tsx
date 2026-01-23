@@ -498,7 +498,7 @@ export default function ProfilePage() {
                     </h3>
 
                     <p className="text-gray-400 font-bold text-sm mb-8 max-w-lg leading-relaxed uppercase tracking-tight">
-                      Ao apagar sua conta, você será removido da Liga TrinCard. Todos os descontos acumulados e o acesso às redes de elite serão deletados instantaneamente.
+                      Ao apagar sua conta, você será removido da . Todos os descontos acumulados e o acesso às redes de elite serão deletados instantaneamente.
                     </p>
 
                     <div className="space-y-3 mb-10">

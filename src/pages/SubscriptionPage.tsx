@@ -145,10 +145,10 @@ export default function SubscriptionPage() {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           planId: plan.id,
-          title: `TrinCard - Plano ${plan.name}`,
+          title: ` - Plano ${plan.name}`,
           price: plan.price,
           userEmail: userEmail,
-          name: userProfile?.full_name || 'Cliente TrinCard',
+          name: userProfile?.full_name || 'Cliente ',
           cpfCnpj: userProfile?.cpf || '',
           frontendUrl: window.location.origin
         }

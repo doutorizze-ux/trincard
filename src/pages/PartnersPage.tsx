@@ -82,7 +82,7 @@ export default function PartnersPage() {
   };
 
   const loadFavorites = () => {
-    const saved = localStorage.getItem('trincard_favorites');
+    const saved = localStorage.getItem('_favorites');
     if (saved) {
       setFavorites(JSON.parse(saved));
     }
@@ -94,7 +94,7 @@ export default function PartnersPage() {
       : [...favorites, partnerId];
 
     setFavorites(newFavorites);
-    localStorage.setItem('trincard_favorites', JSON.stringify(newFavorites));
+    localStorage.setItem('_favorites', JSON.stringify(newFavorites));
 
     toast.success(
       favorites.includes(partnerId)
@@ -108,7 +108,7 @@ export default function PartnersPage() {
       try {
         await navigator.share({
           title: partner.name,
-          text: `Confira este parceiro do TrinCard: ${partner.name}`,
+          text: `Confira este parceiro do : ${partner.name}`,
           url: window.location.href
         });
       } catch (error) {
@@ -117,7 +117,7 @@ export default function PartnersPage() {
     } else {
       // Fallback to clipboard
       navigator.clipboard.writeText(
-        `Confira este parceiro do TrinCard: ${partner.name} - ${window.location.href}`
+        `Confira este parceiro do : ${partner.name} - ${window.location.href}`
       );
       toast.success('Link copiado para a área de transferência');
     }

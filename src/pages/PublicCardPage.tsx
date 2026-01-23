@@ -69,12 +69,12 @@ export default function PublicCardPage() {
                 <div className="mb-12 text-center">
                     <Link to="/" className="inline-flex items-center space-x-2 text-gray-500 hover:text-white transition-colors mb-8 uppercase font-black italic tracking-widest text-xs">
                         <ArrowLeft className="h-4 w-4" />
-                        <span>TRINCARD</span>
+                        <span>VOLTAR AO INÍCIO</span>
                     </Link>
-                    <h1 className="text-4xl lg:text-5xl font-black text-white italic tracking-tighter uppercase mb-2">
-                        CARTÃO <span className="text-[#BFFF00]">VERIFICADO</span>
-                    </h1>
-                    <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Sistema de autenticação oficial Liga TrinCard</p>
+                    <div className="flex justify-center mb-6">
+                        <img src="/logo.png" alt="" className="h-20 w-auto object-contain" />
+                    </div>
+                    <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Sistema de autenticação oficial </p>
                 </div>
 
                 <DigitalCard
@@ -129,7 +129,7 @@ export default function PublicCardPage() {
                 </div>
 
                 <footer className="mt-12 text-center text-[0.6rem] font-bold text-gray-600 uppercase tracking-widest">
-                    © 2026 TRINCARD • TECNOLOGIA ESPORTIVA DE ELITE
+                    © 2026  • TECNOLOGIA ESPORTIVA DE ELITE
                 </footer>
             </div>
         </div>

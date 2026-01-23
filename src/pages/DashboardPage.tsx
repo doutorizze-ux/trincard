@@ -174,7 +174,7 @@ export default function DashboardPage() {
               BEM-VINDO, <span className="text-[#FF3131]">{userProfile?.full_name?.split(' ')[0] || 'ATLETA'}</span>!
             </h1>
             <p className="text-gray-500 font-bold mt-4 max-w-2xl uppercase tracking-wide text-sm">
-              Sua central de performance e benefícios exclusivos da Liga TrinCard.
+              Sua central de performance e benefícios exclusivos da Liga TRINCARD.
             </p>
           </div>
 
@@ -269,7 +269,7 @@ export default function DashboardPage() {
                 <div className="text-3xl font-black text-white italic tracking-tighter">
                   ELITE
                 </div>
-                <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mt-2">Trincard Global Rank</p>
+                <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mt-2">TRINCARD Global Rank</p>
               </div>
             </div>
           </div>

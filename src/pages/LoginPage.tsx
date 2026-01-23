@@ -115,9 +115,7 @@ export default function LoginPage() {
           </Link>
 
           <div className="flex justify-center mb-8">
-            <div className="w-20 h-20 bg-[#FF3131] rounded-3xl flex items-center justify-center shadow-[0_0_30px_rgba(191,255,0,0.3)] transform -rotate-12">
-              <Trophy className="text-black h-10 w-10" />
-            </div>
+            <img src="/logo.png" alt="" className="h-24 w-auto object-contain" />
           </div>
 
           <h2 className="text-4xl lg:text-5xl font-black text-white italic tracking-tighter uppercase leading-none mb-3">

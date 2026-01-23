@@ -194,7 +194,7 @@ export default function PlanForm({
                                 value={formData.name}
                                 onChange={(e) => handleInputChange('name', e.target.value)}
                                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
-                                placeholder="Ex: TrinCard VIP"
+                                placeholder="Ex:  VIP"
                                 disabled={loading}
                                 onClick={(e) => e.stopPropagation()}
                             />

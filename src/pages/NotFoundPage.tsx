@@ -89,7 +89,7 @@ export default function NotFoundPage() {
                 </div>
                 <div className="text-left">
                   <p className="font-medium text-gray-900">Fazer Login</p>
-                  <p className="text-sm text-gray-600">Acesse sua conta TrinCard</p>
+                  <p className="text-sm text-gray-600">Acesse sua conta </p>
                 </div>
               </Link>
               
@@ -102,7 +102,7 @@ export default function NotFoundPage() {
                 </div>
                 <div className="text-left">
                   <p className="font-medium text-gray-900">Criar Conta</p>
-                  <p className="text-sm text-gray-600">Cadastre-se no TrinCard</p>
+                  <p className="text-sm text-gray-600">Cadastre-se no </p>
                 </div>
               </Link>
             </div>
@@ -116,10 +116,10 @@ export default function NotFoundPage() {
             <p className="text-sm text-blue-700 mt-1">
               Entre em contato com nosso suporte em{' '}
               <a 
-                href="mailto:suporte@trincard.com" 
+                href="mailto:suporte@.com" 
                 className="font-medium underline hover:no-underline"
               >
-                suporte@trincard.com
+                suporte@.com
               </a>
             </p>
           </div>
