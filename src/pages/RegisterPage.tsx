@@ -606,10 +606,13 @@ export default function RegisterPage() {
           </Link>
 
           <div className="flex justify-center mb-8">
-            <img src="/logo.png" alt="" className="h-24 w-auto object-contain" />
+            <img src="/logo.png" alt="TRINCARD" className="h-24 w-auto object-contain" />
           </div>
 
-          <p className="text-base text-gray-500 font-bold uppercase tracking-[0.2em] mt-8">
+          <h1 className="text-5xl lg:text-7xl font-black text-white italic tracking-tighter uppercase leading-none mb-6">
+            LIGA <span className="text-[#FF3131]">TRINCARD</span>
+          </h1>
+          <p className="text-base text-gray-500 font-bold uppercase tracking-[0.2em]">
             Prepare-se para o próximo nível
           </p>
         </div>
