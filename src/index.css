@@ -9,7 +9,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  --sport-green: #BFFF00;
+  --sport-red: #FF3131;
   --sport-blue: #0070f3;
   --sport-black: #050505;
   --sport-dark-gray: #111111;
@@ -28,16 +28,16 @@ body {
 }
 
 @layer utilities {
-  .text-glow-green {
-    text-shadow: 0 0 15px rgba(191, 255, 0, 0.6);
+  .text-glow-red {
+    text-shadow: 0 0 15px rgba(255, 49, 49, 0.6);
   }
 
-  .bg-sport-green {
-    background-color: var(--sport-green);
+  .bg-sport-red {
+    background-color: var(--sport-red);
   }
 
-  .text-sport-green {
-    color: var(--sport-green);
+  .text-sport-red {
+    color: var(--sport-red);
   }
 
   .skew-section {
@@ -49,7 +49,7 @@ body {
   }
 
   .text-gradient-sport {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#BFFF00] to-[#00f3ff];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#FF3131] to-[#00f3ff];
   }
 }
 
@@ -95,11 +95,11 @@ body {
 
   0%,
   100% {
-    box-shadow: 0 0 5px rgba(191, 255, 0, 0.2);
+    box-shadow: 0 0 5px rgba(255, 49, 49, 0.2);
   }
 
   50% {
-    box-shadow: 0 0 25px rgba(191, 255, 0, 0.5);
+    box-shadow: 0 0 25px rgba(255, 49, 49, 0.5);
   }
 }
 
@@ -126,7 +126,7 @@ body {
 
 /* Custom Checkbox for Sporty Look */
 input[type="checkbox"] {
-  @apply appearance-none w-5 h-5 border-2 border-white/10 rounded bg-black checked:bg-[#BFFF00] checked:border-[#BFFF00] transition-all cursor-pointer relative;
+  @apply appearance-none w-5 h-5 border-2 border-white/10 rounded bg-black checked:bg-[#FF3131] checked:border-[#FF3131] transition-all cursor-pointer relative;
 }
 
 input[type="checkbox"]:checked::after {

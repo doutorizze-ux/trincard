@@ -147,8 +147,8 @@ export default function DashboardPage() {
       <Layout>
         <div className="min-h-screen bg-[#050505] flex items-center justify-center">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-[#BFFF00] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <p className="text-[#BFFF00] font-black italic uppercase tracking-widest animate-pulse">Carregando Dashboard...</p>
+            <div className="w-16 h-16 border-4 border-[#FF3131] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+            <p className="text-[#FF3131] font-black italic uppercase tracking-widest animate-pulse">Carregando Dashboard...</p>
           </div>
         </div>
       </Layout>
@@ -159,19 +159,19 @@ export default function DashboardPage() {
     <Layout>
       <div className="min-h-screen bg-[#050505] py-12 relative overflow-hidden font-outfit">
         {/* Background Decorative Elements */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#BFFF00] opacity-5 blur-[120px] rounded-full -mr-64 -mt-64"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FF3131] opacity-5 blur-[120px] rounded-full -mr-64 -mt-64"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600 opacity-5 blur-[120px] rounded-full -ml-32 -mb-32"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Header */}
           <div className="mb-12">
             <div className="flex items-center space-x-3 mb-4">
-              <span className="bg-[#BFFF00] text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest italic animate-pulse">
+              <span className="bg-[#FF3131] text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest italic animate-pulse">
                 Sessão Ativa
               </span>
             </div>
             <h1 className="text-4xl lg:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
-              BEM-VINDO, <span className="text-[#BFFF00]">{userProfile?.full_name?.split(' ')[0] || 'ATLETA'}</span>!
+              BEM-VINDO, <span className="text-[#FF3131]">{userProfile?.full_name?.split(' ')[0] || 'ATLETA'}</span>!
             </h1>
             <p className="text-gray-500 font-bold mt-4 max-w-2xl uppercase tracking-wide text-sm">
               Sua central de performance e benefícios exclusivos da Liga TrinCard.
@@ -196,9 +196,9 @@ export default function DashboardPage() {
                   <div className="flex flex-wrap gap-4">
                     <button
                       onClick={handleCopyLink}
-                      className="flex items-center space-x-2 bg-white/5 border border-white/10 hover:border-[#BFFF00]/50 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all group"
+                      className="flex items-center space-x-2 bg-white/5 border border-white/10 hover:border-[#FF3131]/50 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all group"
                     >
-                      <ExternalLink className="h-4 w-4 text-[#BFFF00] group-hover:scale-110 transition-transform" />
+                      <ExternalLink className="h-4 w-4 text-[#FF3131] group-hover:scale-110 transition-transform" />
                       <span>COPIAR LINK P/ ESTABELECIMENTO</span>
                     </button>
 
@@ -222,7 +222,7 @@ export default function DashboardPage() {
                   </p>
                   <button
                     onClick={() => navigate('/assinatura')}
-                    className="bg-[#BFFF00] text-black px-8 py-4 rounded-2xl font-black italic uppercase tracking-widest text-sm hover:bg-white transition-all transform active:scale-95 shadow-xl shadow-[#BFFF00]/10"
+                    className="bg-[#FF3131] text-black px-8 py-4 rounded-2xl font-black italic uppercase tracking-widest text-sm hover:bg-white transition-all transform active:scale-95 shadow-xl shadow-[#FF3131]/10"
                   >
                     CONTRATAR PLANO
                   </button>
@@ -232,7 +232,7 @@ export default function DashboardPage() {
 
             {/* Quick Stats Column */}
             <div className="lg:col-span-4 space-y-6">
-              <div className="bg-zinc-900 border border-white/5 rounded-[32px] p-6 hover:border-[#BFFF00]/20 transition-all">
+              <div className="bg-zinc-900 border border-white/5 rounded-[32px] p-6 hover:border-[#FF3131]/20 transition-all">
                 <div className="flex items-center space-x-4 mb-2">
                   <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
                     <TrendingUp className="h-5 w-5 text-green-500" />
@@ -279,12 +279,12 @@ export default function DashboardPage() {
             <div className="bg-zinc-900/40 backdrop-blur-md border border-white/5 rounded-[40px] overflow-hidden">
               <div className="p-8 border-b border-white/5 flex justify-between items-center">
                 <h3 className="text-xl font-black text-white italic uppercase tracking-tighter flex items-center space-x-3">
-                  <Activity className="h-5 w-5 text-[#BFFF00]" />
+                  <Activity className="h-5 w-5 text-[#FF3131]" />
                   <span>Benefícios Sugeridos</span>
                 </h3>
                 <button
                   onClick={() => navigate('/parceiros')}
-                  className="text-xs font-black text-[#BFFF00] uppercase tracking-widest hover:text-white transition-colors"
+                  className="text-xs font-black text-[#FF3131] uppercase tracking-widest hover:text-white transition-colors"
                 >
                   Ver Tudo
                 </button>
@@ -295,7 +295,7 @@ export default function DashboardPage() {
                     {benefits.slice(0, 4).map((benefit: any) => (
                       <div key={benefit.id} className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5 hover:border-white/20 transition-all group">
                         <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center text-[#BFFF00]">
+                          <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center text-[#FF3131]">
                             <Star className="h-5 w-5" />
                           </div>
                           <div>
@@ -304,7 +304,7 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className="text-[#BFFF00] font-black italic text-lg">{benefit.discount_percentage}%</span>
+                          <span className="text-[#FF3131] font-black italic text-lg">{benefit.discount_percentage}%</span>
                           <span className="block text-[8px] text-gray-600 font-black uppercase tracking-widest">OFF</span>
                         </div>
                       </div>
@@ -353,10 +353,10 @@ export default function DashboardPage() {
 
             <button
               onClick={() => navigate('/assinatura')}
-              className="bg-zinc-900 p-6 rounded-[32px] border border-white/5 hover:border-[#BFFF00]/30 transition-all group text-left"
+              className="bg-zinc-900 p-6 rounded-[32px] border border-white/5 hover:border-[#FF3131]/30 transition-all group text-left"
             >
-              <div className="w-12 h-12 bg-[#BFFF00]/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-[#BFFF00] group-hover:text-black transition-all">
-                <Star className="h-6 w-6 text-[#BFFF00] group-hover:text-inherit" />
+              <div className="w-12 h-12 bg-[#FF3131]/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-[#FF3131] group-hover:text-black transition-all">
+                <Star className="h-6 w-6 text-[#FF3131] group-hover:text-inherit" />
               </div>
               <h3 className="text-lg font-black text-white italic uppercase tracking-tighter mb-1">MÉTRICAS DE ELITE</h3>
               <p className="text-[10px] text-gray-600 font-black uppercase tracking-widest leading-relaxed">Gerencie seu plano e upgrades</p>

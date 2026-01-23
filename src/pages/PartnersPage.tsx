@@ -166,7 +166,7 @@ export default function PartnersPage() {
       <Layout>
         <div className="min-h-screen flex items-center justify-center bg-[#050505]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#BFFF00] border-t-transparent mx-auto mb-6"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#FF3131] border-t-transparent mx-auto mb-6"></div>
             <p className="text-gray-400 font-bold uppercase tracking-widest animate-pulse">Buscando Parceiros Elite...</p>
           </div>
         </div>
@@ -179,13 +179,13 @@ export default function PartnersPage() {
       <div className="min-h-screen bg-[#050505] py-12 lg:py-20 overflow-hidden relative">
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600 opacity-5 blur-[120px] rounded-full -mr-64 -mt-64"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#BFFF00] opacity-5 blur-[120px] rounded-full -ml-32 -mb-32"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#FF3131] opacity-5 blur-[120px] rounded-full -ml-32 -mb-32"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Header */}
           <div className="mb-16">
             <h1 className="text-5xl lg:text-7xl font-black text-white italic tracking-tighter uppercase leading-none mb-6">
-              REDES DE <span className="text-[#BFFF00]">ELITE</span>
+              REDES DE <span className="text-[#FF3131]">ELITE</span>
             </h1>
             <p className="text-xl text-gray-500 font-bold max-w-2xl leading-relaxed">
               Explore os melhores estabelecimentos esportivos do país que confiam na nossa plataforma para entregar valor real.
@@ -197,7 +197,7 @@ export default function PartnersPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 items-end">
               {/* Search */}
               <div className="lg:col-span-4">
-                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#BFFF00] mb-3 ml-1">Buscar Nome ou Serviço</label>
+                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3131] mb-3 ml-1">Buscar Nome ou Serviço</label>
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
                   <input
@@ -205,7 +205,7 @@ export default function PartnersPage() {
                     placeholder="Ex: Bodytech, Suplementos..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent font-bold transition-all placeholder:text-gray-700"
+                    className="w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent font-bold transition-all placeholder:text-gray-700"
                   />
                 </div>
               </div>
@@ -217,14 +217,14 @@ export default function PartnersPage() {
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full appearance-none bg-black border border-white/10 text-white rounded-2xl px-5 py-4 pr-12 focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent font-bold transition-all cursor-pointer"
+                    className="w-full appearance-none bg-black border border-white/10 text-white rounded-2xl px-5 py-4 pr-12 focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent font-bold transition-all cursor-pointer"
                   >
                     <option value="all">Todas as Categorias</option>
                     {categories.map(category => (
                       <option key={category} value={category}>{category}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#BFFF00] pointer-events-none" />
+                  <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#FF3131] pointer-events-none" />
                 </div>
               </div>
 
@@ -235,14 +235,14 @@ export default function PartnersPage() {
                   <select
                     value={selectedCity}
                     onChange={(e) => setSelectedCity(e.target.value)}
-                    className="w-full appearance-none bg-black border border-white/10 text-white rounded-2xl px-5 py-4 pr-12 focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent font-bold transition-all cursor-pointer"
+                    className="w-full appearance-none bg-black border border-white/10 text-white rounded-2xl px-5 py-4 pr-12 focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent font-bold transition-all cursor-pointer"
                   >
                     <option value="all">Brasil (Todas)</option>
                     {uniqueCities.map(city => (
                       <option key={city} value={city}>{city}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#BFFF00] pointer-events-none" />
+                  <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#FF3131] pointer-events-none" />
                 </div>
               </div>
 
@@ -252,7 +252,7 @@ export default function PartnersPage() {
                   <button
                     onClick={() => setViewMode('grid')}
                     className={`flex-1 h-12 rounded-xl flex items-center justify-center transition-all ${viewMode === 'grid'
-                      ? 'bg-[#BFFF00] text-black shadow-lg scale-[1.02]'
+                      ? 'bg-[#FF3131] text-black shadow-lg scale-[1.02]'
                       : 'text-gray-500 hover:text-white'
                       }`}
                   >
@@ -261,7 +261,7 @@ export default function PartnersPage() {
                   <button
                     onClick={() => setViewMode('list')}
                     className={`flex-1 h-12 rounded-xl flex items-center justify-center transition-all ${viewMode === 'list'
-                      ? 'bg-[#BFFF00] text-black shadow-lg scale-[1.02]'
+                      ? 'bg-[#FF3131] text-black shadow-lg scale-[1.02]'
                       : 'text-gray-500 hover:text-white'
                       }`}
                   >
@@ -272,7 +272,7 @@ export default function PartnersPage() {
             </div>
 
             <div className="mt-6 flex items-center space-x-2">
-              <div className="w-2 h-2 rounded-full bg-[#BFFF00] animate-pulse"></div>
+              <div className="w-2 h-2 rounded-full bg-[#FF3131] animate-pulse"></div>
               <p className="text-xs font-black uppercase tracking-widest text-gray-500">
                 {sortedPartners.length} Estabelecimentos na sua área
               </p>
@@ -289,7 +289,7 @@ export default function PartnersPage() {
               <p className="text-gray-500 font-bold max-w-sm mx-auto">Tente ajustar seus filtros para encontrar a rede ideal para sua performance.</p>
               <button
                 onClick={() => { setSearchTerm(''); setSelectedCategory('all'); setSelectedCity('all'); }}
-                className="mt-8 text-[#BFFF00] font-black uppercase tracking-widest text-xs hover:underline"
+                className="mt-8 text-[#FF3131] font-black uppercase tracking-widest text-xs hover:underline"
               >
                 Limpar Todos os Filtros
               </button>
@@ -302,7 +302,7 @@ export default function PartnersPage() {
               {sortedPartners.map((partner) => (
                 <div
                   key={partner.id}
-                  className={`group bg-zinc-900 rounded-[32px] border border-white/5 overflow-hidden hover:border-[#BFFF00]/30 transition-all hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] ${viewMode === 'list' ? 'flex flex-col md:flex-row' : ''
+                  className={`group bg-zinc-900 rounded-[32px] border border-white/5 overflow-hidden hover:border-[#FF3131]/30 transition-all hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] ${viewMode === 'list' ? 'flex flex-col md:flex-row' : ''
                     }`}
                 >
                   {/* Partner Image */}
@@ -320,7 +320,7 @@ export default function PartnersPage() {
                         onClick={() => toggleFavorite(partner.id)}
                         className={`w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md transition-all ${favorites.includes(partner.id)
                           ? 'bg-red-500 text-white shadow-lg shadow-red-500/30'
-                          : 'bg-black/40 text-white hover:bg-[#BFFF00] hover:text-black'
+                          : 'bg-black/40 text-white hover:bg-[#FF3131] hover:text-black'
                           }`}
                       >
                         <Heart className={`h-5 w-5 ${favorites.includes(partner.id) ? 'fill-current' : ''
@@ -335,7 +335,7 @@ export default function PartnersPage() {
                     </div>
 
                     <div className="absolute bottom-4 left-4">
-                      <span className="inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-[#BFFF00] text-black shadow-lg">
+                      <span className="inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-[#FF3131] text-black shadow-lg">
                         <Tag className="h-3 w-3 mr-2" />
                         {partner.category}
                       </span>
@@ -347,7 +347,7 @@ export default function PartnersPage() {
                     <div className="flex justify-between items-start mb-6">
                       <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">{partner.name}</h3>
                       <div className="flex items-center space-x-1.5 bg-black/40 px-3 py-1.5 rounded-full border border-white/5">
-                        <Star className="h-4 w-4 text-[#BFFF00] fill-current" />
+                        <Star className="h-4 w-4 text-[#FF3131] fill-current" />
                         <span className="text-xs font-black text-white drop-shadow-sm">4.8</span>
                       </div>
                     </div>
@@ -359,7 +359,7 @@ export default function PartnersPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                       <div className="flex items-center text-xs font-bold text-gray-500 space-x-3">
                         <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-                          <MapPin className="h-4 w-4 text-[#BFFF00]" />
+                          <MapPin className="h-4 w-4 text-[#FF3131]" />
                         </div>
                         <span className="truncate">
                           {partner.address && typeof partner.address === 'object'
@@ -380,15 +380,15 @@ export default function PartnersPage() {
                     </div>
 
                     {/* Benefits Highlight */}
-                    <div className="mb-10 bg-gradient-to-r from-[#BFFF00]/10 to-transparent border-l-4 border-[#BFFF00] p-5 rounded-r-2xl">
-                      <h4 className="text-[10px] font-black text-[#BFFF00] uppercase tracking-[0.2em] mb-2 uppercase italic leading-none">Vantagem Exclusiva:</h4>
+                    <div className="mb-10 bg-gradient-to-r from-[#FF3131]/10 to-transparent border-l-4 border-[#FF3131] p-5 rounded-r-2xl">
+                      <h4 className="text-[10px] font-black text-[#FF3131] uppercase tracking-[0.2em] mb-2 uppercase italic leading-none">Vantagem Exclusiva:</h4>
                       <p className="text-white font-black italic tracking-tighter text-lg leading-tight">
                         🎯 DESCONTO DE 15% EM PERFORMANCE
                       </p>
                     </div>
 
                     {/* Action Button */}
-                    <button className="w-full bg-white text-black py-4 px-6 rounded-2xl font-black italic uppercase tracking-widest hover:bg-[#BFFF00] transition-all flex items-center justify-center space-x-3 transform group-hover:scale-[1.02] active:scale-95 shadow-xl">
+                    <button className="w-full bg-white text-black py-4 px-6 rounded-2xl font-black italic uppercase tracking-widest hover:bg-[#FF3131] transition-all flex items-center justify-center space-x-3 transform group-hover:scale-[1.02] active:scale-95 shadow-xl">
                       <span>VER DETALHES</span>
                       <ExternalLink className="h-5 w-5" />
                     </button>
@@ -401,9 +401,9 @@ export default function PartnersPage() {
           {/* Load More Button */}
           {sortedPartners.length > 0 && (
             <div className="text-center mt-20">
-              <button className="relative group overflow-hidden bg-transparent border-2 border-white/20 hover:border-[#BFFF00] py-5 px-12 rounded-full transition-all">
+              <button className="relative group overflow-hidden bg-transparent border-2 border-white/20 hover:border-[#FF3131] py-5 px-12 rounded-full transition-all">
                 <span className="relative z-10 text-white group-hover:text-black font-black uppercase tracking-widest text-sm transition-colors uppercase italic">Explorar Mais Estabelecimentos</span>
-                <div className="absolute inset-0 bg-[#BFFF00] transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                <div className="absolute inset-0 bg-[#FF3131] transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
               </button>
             </div>
           )}

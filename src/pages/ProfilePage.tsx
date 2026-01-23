@@ -178,14 +178,14 @@ export default function ProfilePage() {
     <Layout>
       <div className="min-h-screen bg-[#050505] py-12 relative overflow-hidden font-outfit">
         {/* Background Decorative Blur */}
-        <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-[#BFFF00] opacity-[0.03] blur-[150px] rounded-full -ml-44 -mt-44"></div>
+        <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-[#FF3131] opacity-[0.03] blur-[150px] rounded-full -ml-44 -mt-44"></div>
         <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-blue-600 opacity-[0.03] blur-[150px] rounded-full -mr-44 -mb-44"></div>
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Header Card */}
           <div className="bg-zinc-900 border border-white/5 rounded-[40px] p-8 lg:p-12 mb-10 shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-8">
-              <div className="bg-[#BFFF00] text-black px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest italic flex items-center space-x-2">
+              <div className="bg-[#FF3131] text-black px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest italic flex items-center space-x-2">
                 <Zap className="h-3 w-3" />
                 <span>Status Elite</span>
               </div>
@@ -193,12 +193,12 @@ export default function ProfilePage() {
 
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-10">
               <div className="relative group">
-                <div className="w-32 h-32 bg-zinc-800 rounded-3xl flex items-center justify-center border border-white/10 group-hover:border-[#BFFF00]/40 transition-all overflow-hidden p-1">
+                <div className="w-32 h-32 bg-zinc-800 rounded-3xl flex items-center justify-center border border-white/10 group-hover:border-[#FF3131]/40 transition-all overflow-hidden p-1">
                   <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-900 rounded-2xl flex items-center justify-center">
-                    <User className="h-16 w-16 text-white/20 group-hover:text-[#BFFF00] transition-colors" />
+                    <User className="h-16 w-16 text-white/20 group-hover:text-[#FF3131] transition-colors" />
                   </div>
                 </div>
-                <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#BFFF00] text-black rounded-xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-xl">
+                <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#FF3131] text-black rounded-xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-xl">
                   <Camera className="h-5 w-5" />
                 </button>
               </div>
@@ -208,7 +208,7 @@ export default function ProfilePage() {
                   {userProfile?.full_name || 'ATLETA ELITE'}
                 </h1>
                 <p className="text-gray-500 font-bold uppercase tracking-widest text-sm mb-6 flex items-center justify-center md:justify-start space-x-2">
-                  <Mail className="h-4 w-4 text-[#BFFF00]" />
+                  <Mail className="h-4 w-4 text-[#FF3131]" />
                   <span>{userProfile?.email}</span>
                 </p>
 
@@ -241,7 +241,7 @@ export default function ProfilePage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as TabType)}
                     className={`flex items-center space-x-3 py-3 px-6 rounded-2xl font-black text-xs italic tracking-widest transition-all ${activeTab === tab.id
-                      ? 'bg-[#BFFF00] text-black shadow-lg shadow-[#BFFF00]/10'
+                      ? 'bg-[#FF3131] text-black shadow-lg shadow-[#FF3131]/10'
                       : 'text-gray-500 hover:text-white hover:bg-white/5'
                       }`}
                   >
@@ -261,7 +261,7 @@ export default function ProfilePage() {
                     {!isEditing ? (
                       <button
                         onClick={() => setIsEditing(true)}
-                        className="flex items-center space-x-2 bg-white/5 text-white border border-white/10 px-6 py-3 rounded-2xl font-black italic uppercase tracking-widest text-xs hover:bg-[#BFFF00] hover:text-black transition-all"
+                        className="flex items-center space-x-2 bg-white/5 text-white border border-white/10 px-6 py-3 rounded-2xl font-black italic uppercase tracking-widest text-xs hover:bg-[#FF3131] hover:text-black transition-all"
                       >
                         <Edit3 className="h-4 w-4" />
                         <span>EDITAR</span>
@@ -271,7 +271,7 @@ export default function ProfilePage() {
                         <button
                           onClick={handleProfileUpdate}
                           disabled={loading}
-                          className="flex items-center space-x-2 bg-[#BFFF00] text-black px-6 py-3 rounded-2xl font-black italic uppercase tracking-widest text-xs hover:bg-white transition-all shadow-xl shadow-[#BFFF00]/10"
+                          className="flex items-center space-x-2 bg-[#FF3131] text-black px-6 py-3 rounded-2xl font-black italic uppercase tracking-widest text-xs hover:bg-white transition-all shadow-xl shadow-[#FF3131]/10"
                         >
                           <Save className="h-4 w-4" />
                           <span>{loading ? 'SALVANDO...' : 'SALVAR'}</span>
@@ -304,7 +304,7 @@ export default function ProfilePage() {
                             type={field.type}
                             value={profileData[field.key as keyof typeof profileData]}
                             onChange={(e) => setProfileData({ ...profileData, [field.key]: e.target.value })}
-                            className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent transition-all font-bold"
+                            className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent transition-all font-bold"
                           />
                         ) : (
                           <div className="bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white font-bold opacity-80 uppercase tracking-tight">
@@ -326,7 +326,7 @@ export default function ProfilePage() {
                           type="text"
                           value={profileData.address}
                           onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
-                          className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent transition-all font-bold"
+                          className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent transition-all font-bold"
                         />
                       ) : (
                         <div className="bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white font-bold opacity-80 uppercase tracking-tight">
@@ -348,20 +348,20 @@ export default function ProfilePage() {
                               placeholder="Cidade"
                               value={profileData.city}
                               onChange={(e) => setProfileData({ ...profileData, city: e.target.value })}
-                              className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#BFFF00] transition-all font-bold"
+                              className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FF3131] transition-all font-bold"
                             />
                             <input
                               type="text"
                               placeholder="UF"
                               value={profileData.state}
                               onChange={(e) => setProfileData({ ...profileData, state: e.target.value })}
-                              className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#BFFF00] transition-all font-bold uppercase"
+                              className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FF3131] transition-all font-bold uppercase"
                             />
                           </>
                         ) : (
                           <div className="bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white font-bold opacity-80 uppercase tracking-tight flex justify-between col-span-2">
                             <span>{profileData.city || '---'}</span>
-                            <span className="text-[#BFFF00]">{profileData.state || '---'}</span>
+                            <span className="text-[#FF3131]">{profileData.state || '---'}</span>
                           </div>
                         )}
                       </div>
@@ -376,14 +376,14 @@ export default function ProfilePage() {
                         <select
                           value={profileData.card_type}
                           onChange={(e) => setProfileData({ ...profileData, card_type: e.target.value as 'digital' | 'physical' })}
-                          className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#BFFF00] transition-all font-bold uppercase tracking-widest text-xs"
+                          className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FF3131] transition-all font-bold uppercase tracking-widest text-xs"
                         >
                           <option value="digital">DIGITAL (APP)</option>
                           <option value="physical">FÍSICO (ENTREGUE)</option>
                         </select>
                       ) : (
                         <div className="bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white font-bold opacity-80 uppercase tracking-tight flex items-center space-x-2">
-                          <div className={`w-2 h-2 rounded-full ${profileData.card_type === 'physical' ? 'bg-blue-500' : 'bg-[#BFFF00]'}`}></div>
+                          <div className={`w-2 h-2 rounded-full ${profileData.card_type === 'physical' ? 'bg-blue-500' : 'bg-[#FF3131]'}`}></div>
                           <span>{profileData.card_type === 'physical' ? 'Físico' : 'Digital'}</span>
                         </div>
                       )}
@@ -398,10 +398,10 @@ export default function ProfilePage() {
                   <h2 className="text-2xl font-black text-white italic tracking-tighter uppercase mb-2">SEGURANÇA ELITE</h2>
                   <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] mb-10">Proteja seus dados de performance e benefícios.</p>
 
-                  <div className="bg-[#BFFF00]/5 border border-[#BFFF00]/20 rounded-3xl p-6 mb-10 flex items-start space-x-4">
-                    <Shield className="h-6 w-6 text-[#BFFF00]" />
+                  <div className="bg-[#FF3131]/5 border border-[#FF3131]/20 rounded-3xl p-6 mb-10 flex items-start space-x-4">
+                    <Shield className="h-6 w-6 text-[#FF3131]" />
                     <div>
-                      <h3 className="font-black text-[#BFFF00] italic uppercase tracking-widest text-xs">Alterar Credenciais</h3>
+                      <h3 className="font-black text-[#FF3131] italic uppercase tracking-widest text-xs">Alterar Credenciais</h3>
                       <p className="text-gray-500 font-medium text-xs mt-1">Sua nova senha deve conter pelo menos 6 caracteres e símbolos de alta fidelidade.</p>
                     </div>
                   </div>
@@ -419,7 +419,7 @@ export default function ProfilePage() {
                             type={field.visible ? 'text' : 'password'}
                             value={passwordData[field.key as keyof typeof passwordData]}
                             onChange={(e) => setPasswordData({ ...passwordData, [field.key]: e.target.value })}
-                            className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white pr-12 focus:ring-2 focus:ring-[#BFFF00] transition-all font-bold"
+                            className="w-full bg-black border border-white/10 rounded-2xl px-5 py-3 text-white pr-12 focus:ring-2 focus:ring-[#FF3131] transition-all font-bold"
                           />
                           <button
                             type="button"
@@ -436,7 +436,7 @@ export default function ProfilePage() {
                   <button
                     onClick={handlePasswordChange}
                     disabled={loading || !passwordData.newPassword}
-                    className="bg-[#BFFF00] text-black px-10 py-4 rounded-2xl font-black italic uppercase tracking-widest text-xs hover:bg-white transition-all transform active:scale-95 shadow-xl shadow-[#BFFF00]/10"
+                    className="bg-[#FF3131] text-black px-10 py-4 rounded-2xl font-black italic uppercase tracking-widest text-xs hover:bg-white transition-all transform active:scale-95 shadow-xl shadow-[#FF3131]/10"
                   >
                     {loading ? 'AUTENTICANDO...' : 'ATUALIZAR SENHA'}
                   </button>
@@ -467,7 +467,7 @@ export default function ProfilePage() {
                             onChange={(e) => setNotifications({ ...notifications, [n.id]: e.target.checked })}
                             className="src-only peer hidden"
                           />
-                          <div className="w-12 h-6 bg-zinc-800 rounded-full peer peer-checked:bg-[#BFFF00] transition-colors relative after:content-[''] after:absolute after:top-1 after:left-1 after:bg-gray-400 peer-checked:after:bg-black after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-6"></div>
+                          <div className="w-12 h-6 bg-zinc-800 rounded-full peer peer-checked:bg-[#FF3131] transition-colors relative after:content-[''] after:absolute after:top-1 after:left-1 after:bg-gray-400 peer-checked:after:bg-black after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-6"></div>
                         </label>
                       </div>
                     ))}
@@ -475,7 +475,7 @@ export default function ProfilePage() {
 
                   <button
                     onClick={() => toast.success('Preferências de elite atualizadas!')}
-                    className="mt-10 bg-[#BFFF00] text-black px-10 py-4 rounded-2xl font-black italic uppercase tracking-widest text-xs hover:bg-white transition-all shadow-xl shadow-[#BFFF00]/10"
+                    className="mt-10 bg-[#FF3131] text-black px-10 py-4 rounded-2xl font-black italic uppercase tracking-widest text-xs hover:bg-white transition-all shadow-xl shadow-[#FF3131]/10"
                   >
                     SALVAR PREFERÊNCIAS
                   </button>

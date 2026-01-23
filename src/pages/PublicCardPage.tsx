@@ -42,7 +42,7 @@ export default function PublicCardPage() {
     if (loading) {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#BFFF00] border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#FF3131] border-t-transparent"></div>
             </div>
         );
     }
@@ -53,7 +53,7 @@ export default function PublicCardPage() {
                 <ShieldAlert className="h-20 w-20 text-red-500 mb-6" />
                 <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">VERIFICAÇÃO FALHOU</h1>
                 <p className="text-gray-500 font-bold mb-8 uppercase text-sm tracking-widest">{error || 'Cartão não encontrado'}</p>
-                <Link to="/" className="text-[#BFFF00] font-black uppercase italic hover:underline">Voltar para Início</Link>
+                <Link to="/" className="text-[#FF3131] font-black uppercase italic hover:underline">Voltar para Início</Link>
             </div>
         );
     }
@@ -63,7 +63,7 @@ export default function PublicCardPage() {
     return (
         <div className="min-h-screen bg-black py-12 px-4 flex flex-col items-center justify-center">
             {/* Background patterns */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#BFFF00] opacity-5 blur-[120px] rounded-full"></div>
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FF3131] opacity-5 blur-[120px] rounded-full"></div>
 
             <div className="relative z-10 w-full max-w-[600px] flex flex-col items-center">
                 <div className="mb-12 text-center">
@@ -72,7 +72,7 @@ export default function PublicCardPage() {
                         <span>TRINCARD</span>
                     </Link>
                     <h1 className="text-4xl lg:text-5xl font-black text-white italic tracking-tighter uppercase mb-2">
-                        CARTÃO <span className="text-[#BFFF00]">VERIFICADO</span>
+                        CARTÃO <span className="text-[#FF3131]">VERIFICADO</span>
                     </h1>
                     <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Sistema de autenticação oficial Liga TrinCard</p>
                 </div>
@@ -87,7 +87,7 @@ export default function PublicCardPage() {
                 />
 
                 <div className="mt-12 w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className={`p-6 rounded-3xl border ${isActive ? 'bg-lime-500/10 border-lime-500/20 text-lime-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                    <div className={`p-6 rounded-3xl border ${isActive ? 'bg-red-600/10 border-red-600/20 text-red-500' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
                         <div className="flex items-center space-x-4">
                             {isActive ? <ShieldCheck className="h-8 w-8" /> : <ShieldAlert className="h-8 w-8" />}
                             <div>
@@ -110,7 +110,7 @@ export default function PublicCardPage() {
 
                 <div className="mt-12 p-8 bg-white/5 rounded-[40px] border border-white/5 w-full">
                     <h3 className="text-sm font-black text-white uppercase italic tracking-widest mb-6 flex items-center space-x-2">
-                        <CheckCircle className="h-4 w-4 text-[#BFFF00]" />
+                        <CheckCircle className="h-4 w-4 text-[#FF3131]" />
                         <span>BENEFÍCIOS GARANTIDOS</span>
                     </h3>
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -121,7 +121,7 @@ export default function PublicCardPage() {
                             'Suplementação Elite'
                         ].map((item, i) => (
                             <li key={i} className="flex items-center space-x-2 text-xs font-bold text-gray-400">
-                                <div className="w-1.5 h-1.5 bg-[#BFFF00] rounded-full"></div>
+                                <div className="w-1.5 h-1.5 bg-[#FF3131] rounded-full"></div>
                                 <span>{item}</span>
                             </li>
                         ))}

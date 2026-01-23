@@ -315,7 +315,7 @@ export default function RegisterPage() {
 
       {/* Full Name */}
       <div>
-        <label htmlFor="fullName" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#BFFF00] mb-3 ml-1">
+        <label htmlFor="fullName" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3131] mb-3 ml-1">
           Nome Completo *
         </label>
         <div className="relative">
@@ -328,7 +328,7 @@ export default function RegisterPage() {
             type="text"
             value={formData.fullName}
             onChange={handleInputChange}
-            className={`block w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.fullName ? 'border-red-500/50 bg-red-500/5' : ''
+            className={`block w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.fullName ? 'border-red-500/50 bg-red-500/5' : ''
               }`}
             placeholder="Seu nome completo"
           />
@@ -338,7 +338,7 @@ export default function RegisterPage() {
 
       {/* Email */}
       <div>
-        <label htmlFor="email" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#BFFF00] mb-3 ml-1">
+        <label htmlFor="email" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3131] mb-3 ml-1">
           Seu Melhor Email *
         </label>
         <div className="relative">
@@ -351,7 +351,7 @@ export default function RegisterPage() {
             type="email"
             value={formData.email}
             onChange={handleInputChange}
-            className={`block w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.email ? 'border-red-500/50 bg-red-500/5' : ''
+            className={`block w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.email ? 'border-red-500/50 bg-red-500/5' : ''
               }`}
             placeholder="atleta@performa.com"
           />
@@ -362,7 +362,7 @@ export default function RegisterPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Password */}
         <div>
-          <label htmlFor="password" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#BFFF00] mb-3 ml-1">
+          <label htmlFor="password" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3131] mb-3 ml-1">
             Senha *
           </label>
           <div className="relative">
@@ -372,7 +372,7 @@ export default function RegisterPage() {
               type={showPassword ? 'text' : 'password'}
               value={formData.password}
               onChange={handleInputChange}
-              className={`block w-full px-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.password ? 'border-red-500/50 bg-red-500/5' : ''
+              className={`block w-full px-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.password ? 'border-red-500/50 bg-red-500/5' : ''
                 }`}
               placeholder="Mín. 6"
             />
@@ -389,7 +389,7 @@ export default function RegisterPage() {
 
         {/* Confirm Password */}
         <div>
-          <label htmlFor="confirmPassword" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#BFFF00] mb-3 ml-1">
+          <label htmlFor="confirmPassword" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3131] mb-3 ml-1">
             Confirmar *
           </label>
           <div className="relative">
@@ -399,7 +399,7 @@ export default function RegisterPage() {
               type={showConfirmPassword ? 'text' : 'password'}
               value={formData.confirmPassword}
               onChange={handleInputChange}
-              className={`block w-full px-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.confirmPassword ? 'border-red-500/50 bg-red-500/5' : ''
+              className={`block w-full px-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.confirmPassword ? 'border-red-500/50 bg-red-500/5' : ''
                 }`}
               placeholder="Confirmar"
             />
@@ -427,7 +427,7 @@ export default function RegisterPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Phone */}
         <div>
-          <label htmlFor="phone" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#BFFF00] mb-3 ml-1">
+          <label htmlFor="phone" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3131] mb-3 ml-1">
             WhatsApp Ativo *
           </label>
           <div className="relative">
@@ -440,7 +440,7 @@ export default function RegisterPage() {
               type="tel"
               value={formatPhone(formData.phone)}
               onChange={handlePhoneChange}
-              className={`block w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.phone ? 'border-red-500/50 bg-red-500/5' : ''
+              className={`block w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.phone ? 'border-red-500/50 bg-red-500/5' : ''
                 }`}
               placeholder="(00) 00000-0000"
               maxLength={15}
@@ -451,7 +451,7 @@ export default function RegisterPage() {
 
         {/* CPF */}
         <div>
-          <label htmlFor="cpf" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#BFFF00] mb-3 ml-1">
+          <label htmlFor="cpf" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3131] mb-3 ml-1">
             CPF Registro *
           </label>
           <div className="relative">
@@ -464,7 +464,7 @@ export default function RegisterPage() {
               type="text"
               value={formatCPF(formData.cpf)}
               onChange={handleCpfChange}
-              className={`block w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.cpf ? 'border-red-500/50 bg-red-500/5' : ''
+              className={`block w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.cpf ? 'border-red-500/50 bg-red-500/5' : ''
                 }`}
               placeholder="000.000.000-00"
               maxLength={14}
@@ -485,7 +485,7 @@ export default function RegisterPage() {
 
       {/* Address */}
       <div>
-        <label htmlFor="address" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#BFFF00] mb-3 ml-1">
+        <label htmlFor="address" className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3131] mb-3 ml-1">
           Endereço Completo *
         </label>
         <div className="relative">
@@ -498,7 +498,7 @@ export default function RegisterPage() {
             type="text"
             value={formData.address}
             onChange={handleInputChange}
-            className={`block w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#BFFF00] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.address ? 'border-red-500/50 bg-red-500/5' : ''
+            className={`block w-full pl-12 pr-6 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF3131] focus:border-transparent transition-all font-bold placeholder:text-gray-800 ${errors.address ? 'border-red-500/50 bg-red-500/5' : ''
               }`}
             placeholder="Rua, número, complemento"
           />
@@ -515,7 +515,7 @@ export default function RegisterPage() {
             type="text"
             value={formatZipCode(formData.zipCode)}
             onChange={handleZipCodeChange}
-            className={`block w-full px-5 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#BFFF00] transition-all font-bold placeholder:text-gray-800 ${errors.zipCode ? 'border-red-500/50 bg-red-500/5' : ''}`}
+            className={`block w-full px-5 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF3131] transition-all font-bold placeholder:text-gray-800 ${errors.zipCode ? 'border-red-500/50 bg-red-500/5' : ''}`}
             placeholder="00000-000"
             maxLength={9}
           />
@@ -527,7 +527,7 @@ export default function RegisterPage() {
             name="city"
             value={formData.city}
             onChange={handleInputChange}
-            className="block w-full px-5 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#BFFF00] transition-all font-bold placeholder:text-gray-800"
+            className="block w-full px-5 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF3131] transition-all font-bold placeholder:text-gray-800"
             placeholder="Cidade"
           />
         </div>
@@ -538,7 +538,7 @@ export default function RegisterPage() {
             name="state"
             value={formData.state}
             onChange={handleInputChange}
-            className="block w-full px-5 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#BFFF00] transition-all font-bold cursor-pointer"
+            className="block w-full px-5 py-4 bg-black border border-white/10 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF3131] transition-all font-bold cursor-pointer"
           >
             <option value="">UF</option>
             {['SP', 'RJ', 'MG', 'RS', 'PR', 'SC', 'BA', 'GO', 'PE', 'CE'].map(uf => <option key={uf} value={uf}>{uf}</option>)}
@@ -560,7 +560,7 @@ export default function RegisterPage() {
           <div
             key={plan.id}
             className={`group relative overflow-hidden border-2 rounded-[32px] p-6 cursor-pointer transition-all duration-300 ${formData.selectedPlan === plan.id
-              ? 'border-[#BFFF00] bg-[#BFFF00]/5 scale-[1.02]'
+              ? 'border-[#FF3131] bg-[#FF3131]/5 scale-[1.02]'
               : 'border-white/5 bg-black hover:border-white/20'
               }`}
             onClick={() => setFormData(prev => ({ ...prev, selectedPlan: plan.id }))}
@@ -568,22 +568,22 @@ export default function RegisterPage() {
             <div className="flex justify-between items-center relative z-10">
               <div className="flex-1">
                 <div className="flex items-center space-x-3 mb-2">
-                  <h5 className={`font-black uppercase italic tracking-tighter text-xl ${formData.selectedPlan === plan.id ? 'text-[#BFFF00]' : 'text-white'}`}>{plan.name}</h5>
+                  <h5 className={`font-black uppercase italic tracking-tighter text-xl ${formData.selectedPlan === plan.id ? 'text-[#FF3131]' : 'text-white'}`}>{plan.name}</h5>
                   {plan.name === 'Premium' && (
-                    <span className="bg-[#BFFF00] text-black text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Elite</span>
+                    <span className="bg-[#FF3131] text-black text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Elite</span>
                   )}
                 </div>
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{plan.description}</p>
               </div>
               <div className="text-right">
-                <div className={`text-3xl font-black italic tracking-tighter ${formData.selectedPlan === plan.id ? 'text-[#BFFF00]' : 'text-white'}`}>
+                <div className={`text-3xl font-black italic tracking-tighter ${formData.selectedPlan === plan.id ? 'text-[#FF3131]' : 'text-white'}`}>
                   R$ {plan.price.toFixed(2)}
                 </div>
                 <div className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1">por ciclo</div>
               </div>
             </div>
             {formData.selectedPlan === plan.id && (
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#BFFF00]/10 blur-3xl rounded-full -mr-16 -mt-16"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF3131]/10 blur-3xl rounded-full -mr-16 -mt-16"></div>
             )}
           </div>
         ))}
@@ -595,24 +595,24 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-[#050505] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-outfit">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600 opacity-5 blur-[120px] rounded-full -mr-64 -mt-64"></div>
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#BFFF00] opacity-5 blur-[120px] rounded-full -ml-32 -mb-32"></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#FF3131] opacity-5 blur-[120px] rounded-full -ml-32 -mb-32"></div>
 
       <div className="max-w-2xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
-          <Link to="/" className="inline-flex items-center space-x-2 text-gray-500 hover:text-[#BFFF00] transition-colors mb-10 group font-bold uppercase tracking-widest text-xs">
+          <Link to="/" className="inline-flex items-center space-x-2 text-gray-500 hover:text-[#FF3131] transition-colors mb-10 group font-bold uppercase tracking-widest text-xs">
             <ArrowLeft className="h-4 w-4 transform group-hover:-translate-x-1 transition-transform" />
             <span>Voltar ao início</span>
           </Link>
 
           <div className="flex justify-center mb-8">
-            <div className="w-20 h-20 bg-[#BFFF00] rounded-3xl flex items-center justify-center shadow-[0_0_30px_rgba(191,255,0,0.3)] transform rotate-3 hover:rotate-6 transition-transform">
+            <div className="w-20 h-20 bg-[#FF3131] rounded-3xl flex items-center justify-center shadow-[0_0_30px_rgba(191,255,0,0.3)] transform rotate-3 hover:rotate-6 transition-transform">
               <Zap className="text-black h-10 w-10 fill-current" />
             </div>
           </div>
 
           <h1 className="text-5xl lg:text-7xl font-black text-white italic tracking-tighter uppercase leading-none mb-6">
-            LIGA <span className="text-[#BFFF00]">TRINCARD</span>
+            LIGA <span className="text-[#FF3131]">TRINCARD</span>
           </h1>
           <p className="text-base text-gray-500 font-bold uppercase tracking-[0.2em]">
             Prepare-se para o próximo nível
@@ -627,14 +627,14 @@ export default function RegisterPage() {
               <React.Fragment key={step}>
                 <div className="flex flex-col items-center group cursor-pointer" onClick={() => step < currentStep && setCurrentStep(step)}>
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all ${step === currentStep
-                      ? 'bg-[#BFFF00] text-black shadow-[0_0_20px_rgba(191,255,0,0.4)] scale-110'
+                      ? 'bg-[#FF3131] text-black shadow-[0_0_20px_rgba(191,255,0,0.4)] scale-110'
                       : step < currentStep
                         ? 'bg-blue-600 text-white'
                         : 'bg-black text-gray-700 border border-white/5'
                     }`}>
                     {step < currentStep ? <CheckCircle className="h-5 w-5" /> : step}
                   </div>
-                  <span className={`text-[8px] mt-3 font-black uppercase tracking-widest ${step === currentStep ? 'text-[#BFFF00]' : 'text-gray-600'}`}>
+                  <span className={`text-[8px] mt-3 font-black uppercase tracking-widest ${step === currentStep ? 'text-[#FF3131]' : 'text-gray-600'}`}>
                     ETAPA {step}
                   </span>
                 </div>
@@ -664,7 +664,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading || isRateLimited}
-                className="flex-1 lg:flex-none lg:min-w-[240px] px-10 py-5 bg-[#BFFF00] text-black font-black italic uppercase tracking-widest text-sm rounded-2xl hover:bg-white transition-all transform active:scale-95 shadow-xl shadow-[#BFFF00]/10 flex items-center justify-center space-x-3"
+                className="flex-1 lg:flex-none lg:min-w-[240px] px-10 py-5 bg-[#FF3131] text-black font-black italic uppercase tracking-widest text-sm rounded-2xl hover:bg-white transition-all transform active:scale-95 shadow-xl shadow-[#FF3131]/10 flex items-center justify-center space-x-3"
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-2 border-black border-t-transparent"></div>
@@ -689,7 +689,7 @@ export default function RegisterPage() {
               JÁ É DA LIGA?{' '}
               <Link
                 to="/login"
-                className="text-[#BFFF00] hover:text-white transition-colors ml-1"
+                className="text-[#FF3131] hover:text-white transition-colors ml-1"
               >
                 FAÇA LOGIN
               </Link>

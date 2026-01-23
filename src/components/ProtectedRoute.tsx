@@ -17,7 +17,7 @@ export function ProtectedRoute({ children, requireAdmin = false, adminOnly = fal
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#050505]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-[#BFFF00] mx-auto mb-4" />
+          <Loader2 className="h-12 w-12 animate-spin text-[#FF3131] mx-auto mb-4" />
           <p className="text-gray-400 font-black uppercase tracking-widest text-sm animate-pulse">Carregando...</p>
         </div>
       </div>

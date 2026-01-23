@@ -242,7 +242,7 @@ export default function SubscriptionPage() {
       <Layout>
         <div className="min-h-screen bg-[#050505] flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#BFFF00] border-t-transparent mx-auto mb-6"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#FF3131] border-t-transparent mx-auto mb-6"></div>
             <p className="text-gray-400 font-bold uppercase tracking-widest animate-pulse">CARREGANDO PLANOS DE ELITE...</p>
           </div>
         </div>
@@ -254,14 +254,14 @@ export default function SubscriptionPage() {
     <Layout>
       <div className="min-h-screen bg-[#050505] py-12 lg:py-20 relative overflow-hidden font-outfit">
         {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#BFFF00] opacity-5 blur-[120px] rounded-full -mr-64 -mt-64"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FF3131] opacity-5 blur-[120px] rounded-full -mr-64 -mt-64"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600 opacity-5 blur-[120px] rounded-full -ml-32 -mb-32"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Header */}
           <div className="mb-16">
             <h1 className="text-5xl lg:text-7xl font-black text-white italic tracking-tighter uppercase leading-none mb-6">
-              SUA <span className="text-[#BFFF00]">PERFORMANCE</span>
+              SUA <span className="text-[#FF3131]">PERFORMANCE</span>
             </h1>
             <p className="text-xl text-gray-500 font-bold max-w-2xl leading-relaxed">
               Gerencie seus planos e impulsione seus resultados com a rede mais seleta de benefícios esportivos.
@@ -270,9 +270,9 @@ export default function SubscriptionPage() {
 
           {/* Current Subscription */}
           {currentSubscription && (
-            <div className="bg-zinc-900/50 backdrop-blur-xl border border-[#BFFF00]/20 rounded-[40px] p-8 lg:p-12 mb-16 shadow-2xl relative overflow-hidden">
+            <div className="bg-zinc-900/50 backdrop-blur-xl border border-[#FF3131]/20 rounded-[40px] p-8 lg:p-12 mb-16 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8">
-                <div className="flex items-center space-x-2 bg-[#BFFF00] text-black px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-lg animate-pulse">
+                <div className="flex items-center space-x-2 bg-[#FF3131] text-black px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-lg animate-pulse">
                   <CheckCircle className="h-4 w-4" />
                   <span>CONTA ATIVA</span>
                 </div>
@@ -282,7 +282,7 @@ export default function SubscriptionPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                 <div className="flex items-start space-x-5">
-                  <div className="w-16 h-16 bg-[#BFFF00] rounded-2xl flex items-center justify-center text-black transform -rotate-6">
+                  <div className="w-16 h-16 bg-[#FF3131] rounded-2xl flex items-center justify-center text-black transform -rotate-6">
                     {getPlanIcon(currentSubscription.plans?.name || '')}
                   </div>
                   <div>
@@ -292,7 +292,7 @@ export default function SubscriptionPage() {
                 </div>
 
                 <div className="flex items-start space-x-5">
-                  <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-[#BFFF00]">
+                  <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-[#FF3131]">
                     <Calendar className="h-8 w-8" />
                   </div>
                   <div>
@@ -313,7 +313,7 @@ export default function SubscriptionPage() {
               </div>
 
               <div className="flex flex-wrap gap-4 mt-12 border-t border-white/5 pt-10">
-                <button className="flex items-center space-x-3 bg-white text-black px-8 py-4 rounded-2xl font-black italic uppercase tracking-widest text-sm hover:bg-[#BFFF00] transition-all transform active:scale-95 shadow-xl">
+                <button className="flex items-center space-x-3 bg-white text-black px-8 py-4 rounded-2xl font-black italic uppercase tracking-widest text-sm hover:bg-[#FF3131] transition-all transform active:scale-95 shadow-xl">
                   <RefreshCw className="h-5 w-5" />
                   <span>RENOVAR AGORA</span>
                 </button>
@@ -337,12 +337,12 @@ export default function SubscriptionPage() {
             <div className="mb-20">
               <div className="text-center mb-16">
                 <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase mb-4">EVOLUA SEU STATUS</h2>
-                <div className="w-24 h-1 bg-[#BFFF00] mx-auto rounded-full"></div>
+                <div className="w-24 h-1 bg-[#FF3131] mx-auto rounded-full"></div>
               </div>
 
               {loadingPlans ? (
                 <div className="text-center py-20">
-                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#BFFF00] border-t-transparent mx-auto"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#FF3131] border-t-transparent mx-auto"></div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -356,19 +356,19 @@ export default function SubscriptionPage() {
                       <div
                         key={plan.id}
                         className={`group bg-zinc-900 rounded-[48px] border-2 transition-all duration-500 overflow-hidden flex flex-col ${isPopular
-                          ? 'border-[#BFFF00] shadow-[0_20px_60px_rgba(191,255,0,0.15)] scale-[1.05] z-10'
+                          ? 'border-[#FF3131] shadow-[0_20px_60px_rgba(191,255,0,0.15)] scale-[1.05] z-10'
                           : 'border-white/5 hover:border-white/20'
                           }`}
                       >
                         {isPopular && (
-                          <div className="bg-[#BFFF00] text-black text-center py-2 font-black uppercase tracking-[0.3em] text-[10px] italic">
+                          <div className="bg-[#FF3131] text-black text-center py-2 font-black uppercase tracking-[0.3em] text-[10px] italic">
                             🏆 A ESCOLHA DOS ATLETAS 🏆
                           </div>
                         )}
 
                         <div className="p-10 flex-1 flex flex-col">
                           <div className="flex justify-between items-start mb-8">
-                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all ${isPopular ? 'bg-[#BFFF00] text-black shadow-lg shadow-[#BFFF00]/20' : 'bg-white/5 text-gray-400 group-hover:text-white'}`}>
+                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all ${isPopular ? 'bg-[#FF3131] text-black shadow-lg shadow-[#FF3131]/20' : 'bg-white/5 text-gray-400 group-hover:text-white'}`}>
                               {getPlanIcon(planName)}
                             </div>
                           </div>
@@ -378,7 +378,7 @@ export default function SubscriptionPage() {
 
                           <div className="mb-10">
                             <div className="flex items-baseline space-x-1">
-                              <span className={`text-5xl font-black italic tracking-tighter transition-colors ${isPopular ? 'text-[#BFFF00]' : 'text-white'}`}>
+                              <span className={`text-5xl font-black italic tracking-tighter transition-colors ${isPopular ? 'text-[#FF3131]' : 'text-white'}`}>
                                 {formatCurrency(planPrice).split(',')[0]}
                               </span>
                               {formatCurrency(planPrice).includes(',') && (
@@ -393,7 +393,7 @@ export default function SubscriptionPage() {
                           <div className="space-y-4 mb-10 flex-1">
                             {featuresList.map((feature: any, idx: number) => (
                               <div key={idx} className="flex items-center space-x-3">
-                                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${isPopular ? 'bg-[#BFFF00]' : 'bg-white/10'}`}>
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${isPopular ? 'bg-[#FF3131]' : 'bg-white/10'}`}>
                                   <CheckCircle className={`h-3 w-3 ${isPopular ? 'text-black' : 'text-gray-400'}`} />
                                 </div>
                                 <span className="text-sm font-bold text-gray-400 uppercase tracking-tight">{typeof feature === 'string' ? feature : String(feature)}</span>
@@ -407,7 +407,7 @@ export default function SubscriptionPage() {
                           <button
                             onClick={() => handlePlanSelection(plan.id)}
                             className={`w-full py-5 rounded-3xl font-black italic uppercase tracking-widest text-sm transition-all transform active:scale-95 shadow-xl ${isPopular
-                              ? 'bg-[#BFFF00] text-black hover:bg-white shadow-[#BFFF00]/10'
+                              ? 'bg-[#FF3131] text-black hover:bg-white shadow-[#FF3131]/10'
                               : 'bg-white/5 text-white hover:bg-white hover:text-black border border-white/10'
                               }`}
                           >
@@ -430,7 +430,7 @@ export default function SubscriptionPage() {
               { icon: Shield, title: 'Check Total', desc: 'Dados protegidos pela liga de elite.', color: 'text-green-500' },
               { icon: Users, title: 'Rede Global', desc: 'Centenas de hubs de performance.', color: 'text-blue-500' },
               { icon: Smartphone, title: 'Digital First', desc: 'Tudo no app, sem burocracia.', color: 'text-purple-500' },
-              { icon: Trophy, title: 'Status Elite', desc: 'Vantagens exclusivas de atleta.', color: 'text-[#BFFF00]' }
+              { icon: Trophy, title: 'Status Elite', desc: 'Vantagens exclusivas de atleta.', color: 'text-[#FF3131]' }
             ].map((benefit, i) => (
               <div key={i} className="bg-zinc-900/30 border border-white/5 p-8 rounded-[32px] hover:border-white/20 transition-all group">
                 <div className={`w-14 h-14 bg-black rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${benefit.color}`}>
@@ -447,10 +447,10 @@ export default function SubscriptionPage() {
         {showPaymentModal && (
           <div className="fixed inset-0 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
             <div className="bg-zinc-900 border border-white/10 rounded-[48px] max-w-lg w-full p-10 lg:p-12 shadow-3xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-[#BFFF00] to-blue-600"></div>
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-[#FF3131] to-blue-600"></div>
 
               <div className="flex justify-between items-center mb-10">
-                <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">CHECKOUT <span className="text-[#BFFF00]">ELITE</span></h3>
+                <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">CHECKOUT <span className="text-[#FF3131]">ELITE</span></h3>
                 <button onClick={() => setShowPaymentModal(false)} className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-gray-500 hover:text-white transition-all">
                   <XCircle className="h-6 w-6" />
                 </button>
@@ -466,7 +466,7 @@ export default function SubscriptionPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">TOTAL</p>
-                    <span className="text-xl font-black text-[#BFFF00] italic uppercase tracking-tight">
+                    <span className="text-xl font-black text-[#FF3131] italic uppercase tracking-tight">
                       {formatCurrency(plans.find(p => p.id === selectedPlan)?.price || 0)}
                     </span>
                   </div>
@@ -474,8 +474,8 @@ export default function SubscriptionPage() {
               </div>
 
               <div className="text-center py-8">
-                <div className="w-20 h-20 bg-[#BFFF00]/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                  <Shield className="h-10 w-10 text-[#BFFF00]" />
+                <div className="w-20 h-20 bg-[#FF3131]/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                  <Shield className="h-10 w-10 text-[#FF3131]" />
                 </div>
                 {Number(plans.find(p => p.id === selectedPlan)?.price || 0) > 0 ? (
                   <>
@@ -486,7 +486,7 @@ export default function SubscriptionPage() {
 
                     <div className="grid grid-cols-3 gap-4 mb-10">
                       <div className="flex flex-col items-center p-4 bg-black rounded-2xl border border-white/5">
-                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#BFFF00] mb-2 font-black italic">PX</div>
+                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#FF3131] mb-2 font-black italic">PX</div>
                         <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">PIX FAST</span>
                       </div>
                       <div className="flex flex-col items-center p-4 bg-black rounded-2xl border border-white/5">
@@ -513,7 +513,7 @@ export default function SubscriptionPage() {
                 <button
                   onClick={handlePayment}
                   disabled={processingPayment}
-                  className="w-full bg-[#BFFF00] text-black py-5 rounded-2xl font-black italic uppercase tracking-widest text-base hover:bg-white transition-all transform active:scale-95 shadow-2xl shadow-[#BFFF00]/20 flex items-center justify-center space-x-3"
+                  className="w-full bg-[#FF3131] text-black py-5 rounded-2xl font-black italic uppercase tracking-widest text-base hover:bg-white transition-all transform active:scale-95 shadow-2xl shadow-[#FF3131]/20 flex items-center justify-center space-x-3"
                 >
                   {processingPayment ? (
                     <div className="animate-spin rounded-full h-6 w-6 border-2 border-black border-t-transparent"></div>
