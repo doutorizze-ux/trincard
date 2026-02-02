@@ -15,7 +15,6 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { api } from '../lib/api';
-import { supabase } from '../lib/supabase';
 import { Partner } from '../lib/supabase';
 import { toast } from 'sonner';
 import { useDebounce } from '../hooks/useDebounce';
@@ -29,6 +28,7 @@ export default function PartnersPage() {
   const [sortBy, setSortBy] = useState('name');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
 
   // Debounce search term to avoid excessive filtering
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -104,8 +104,8 @@ export default function PartnersPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: partner.name,
-          text: `Confira este parceiro do : ${partner.name}`,
+          title: partner.company_name || partner.name,
+          text: `Confira este parceiro do : ${partner.company_name || partner.name}`,
           url: window.location.href
         });
       } catch (error) {
@@ -114,13 +114,12 @@ export default function PartnersPage() {
     } else {
       // Fallback to clipboard
       navigator.clipboard.writeText(
-        `Confira este parceiro do : ${partner.name} - ${window.location.href}`
+        `Confira este parceiro do : ${partner.company_name || partner.name} - ${window.location.href}`
       );
       toast.success('Link copiado para a área de transferência');
     }
   };
 
-  // Memoize filtered partners to avoid recalculation on every render
   const filteredPartners = useMemo(() => {
     return partners.filter(partner => {
       const matchesSearch = (partner.company_name || partner.name || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
@@ -132,7 +131,6 @@ export default function PartnersPage() {
     });
   }, [partners, debouncedSearchTerm, selectedCategory, selectedCity]);
 
-  // Memoize sorted partners to avoid recalculation on every render
   const sortedPartners = useMemo(() => {
     return [...filteredPartners].sort((a, b) => {
       switch (sortBy) {
@@ -148,7 +146,6 @@ export default function PartnersPage() {
     });
   }, [filteredPartners, sortBy]);
 
-  // Memoize unique cities to avoid recalculation
   const uniqueCities = useMemo(() => {
     return [...new Set(partners.map(p => p.city).filter(Boolean))].sort();
   }, [partners]);
@@ -156,6 +153,14 @@ export default function PartnersPage() {
   const formatPhone = (phone: string) => {
     if (!phone) return '';
     return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  };
+
+  const openPartnerDetails = (partner: Partner) => {
+    setSelectedPartner(partner);
+  };
+
+  const closePartnerDetails = () => {
+    setSelectedPartner(null);
   };
 
   if (loading) {
@@ -174,12 +179,10 @@ export default function PartnersPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-[#050505] py-12 lg:py-20 overflow-hidden relative">
-        {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600 opacity-5 blur-[120px] rounded-full -mr-64 -mt-64"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#FF3131] opacity-5 blur-[120px] rounded-full -ml-32 -mb-32"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Header */}
           <div className="mb-16">
             <h1 className="text-5xl lg:text-7xl font-black text-white italic tracking-tighter uppercase leading-none mb-6">
               REDES DE <span className="text-[#FF3131]">ELITE</span>
@@ -189,10 +192,8 @@ export default function PartnersPage() {
             </p>
           </div>
 
-          {/* Filters */}
           <div className="bg-zinc-900/50 backdrop-blur-xl border border-white/5 rounded-[32px] p-4 lg:p-8 mb-12 shadow-2xl">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 items-end">
-              {/* Search */}
               <div className="lg:col-span-4">
                 <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3131] mb-3 ml-1">Buscar Nome ou Serviço</label>
                 <div className="relative">
@@ -207,7 +208,6 @@ export default function PartnersPage() {
                 </div>
               </div>
 
-              {/* Category Filter */}
               <div className="lg:col-span-3">
                 <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-3 ml-1">Categoria</label>
                 <div className="relative">
@@ -225,7 +225,6 @@ export default function PartnersPage() {
                 </div>
               </div>
 
-              {/* City Filter */}
               <div className="lg:col-span-3">
                 <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-3 ml-1">Cidade</label>
                 <div className="relative">
@@ -243,7 +242,6 @@ export default function PartnersPage() {
                 </div>
               </div>
 
-              {/* Results Count & View Mode */}
               <div className="lg:col-span-2 flex flex-col justify-end">
                 <div className="flex bg-black rounded-2xl p-1.5 border border-white/5 shadow-inner">
                   <button
@@ -276,7 +274,6 @@ export default function PartnersPage() {
             </div>
           </div>
 
-          {/* Partners Grid/List */}
           {sortedPartners.length === 0 ? (
             <div className="text-center py-32 bg-zinc-900/30 rounded-[40px] border border-dashed border-white/10">
               <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
@@ -302,12 +299,11 @@ export default function PartnersPage() {
                   className={`group bg-zinc-900 rounded-[32px] border border-white/5 overflow-hidden hover:border-[#FF3131]/30 transition-all hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] ${viewMode === 'list' ? 'flex flex-col md:flex-row' : ''
                     }`}
                 >
-                  {/* Partner Image */}
                   <div className={`relative overflow-hidden ${viewMode === 'list' ? 'md:w-80 flex-shrink-0' : 'h-64'
                     }`}>
                     <img
-                      src={partner.logo_url || `https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=modern business logo for ${encodeURIComponent(partner.name || '')} ${encodeURIComponent(partner.category || '')}&image_size=square`}
-                      alt={partner.name}
+                      src={partner.logo_url || `https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=modern business logo for ${encodeURIComponent(partner.company_name || partner.name || '')} ${encodeURIComponent(partner.category || '')}&image_size=square`}
+                      alt={partner.company_name || partner.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60"></div>
@@ -339,10 +335,9 @@ export default function PartnersPage() {
                     </div>
                   </div>
 
-                  {/* Partner Info */}
                   <div className={`p-8 ${viewMode === 'list' ? 'flex-1 flex flex-col justify-center' : ''}`}>
                     <div className="flex justify-between items-start mb-6">
-                      <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">{partner.name}</h3>
+                      <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">{partner.company_name || partner.name}</h3>
                       <div className="flex items-center space-x-1.5 bg-black/40 px-3 py-1.5 rounded-full border border-white/5">
                         <Star className="h-4 w-4 text-[#FF3131] fill-current" />
                         <span className="text-xs font-black text-white drop-shadow-sm">4.8</span>
@@ -366,17 +361,16 @@ export default function PartnersPage() {
                         </span>
                       </div>
 
-                      {partner.phone && (
+                      {(partner.contact_phone || partner.phone) && (
                         <div className="flex items-center text-xs font-bold text-gray-500 space-x-3">
                           <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
                             <Phone className="h-4 w-4 text-blue-500" />
                           </div>
-                          <span>{formatPhone(partner.phone)}</span>
+                          <span>{formatPhone(partner.contact_phone || partner.phone || '')}</span>
                         </div>
                       )}
                     </div>
 
-                    {/* Benefits Highlight */}
                     <div className="mb-10 bg-gradient-to-r from-[#FF3131]/10 to-transparent border-l-4 border-[#FF3131] p-5 rounded-r-2xl">
                       <h4 className="text-[10px] font-black text-[#FF3131] uppercase tracking-[0.2em] mb-2 uppercase italic leading-none">Vantagem Exclusiva:</h4>
                       <p className="text-white font-black italic tracking-tighter text-lg leading-tight">
@@ -384,8 +378,10 @@ export default function PartnersPage() {
                       </p>
                     </div>
 
-                    {/* Action Button */}
-                    <button className="w-full bg-white text-black py-4 px-6 rounded-2xl font-black italic uppercase tracking-widest hover:bg-[#FF3131] transition-all flex items-center justify-center space-x-3 transform group-hover:scale-[1.02] active:scale-95 shadow-xl">
+                    <button
+                      onClick={() => openPartnerDetails(partner)}
+                      className="w-full bg-white text-black py-4 px-6 rounded-2xl font-black italic uppercase tracking-widest hover:bg-[#FF3131] transition-all flex items-center justify-center space-x-3 transform group-hover:scale-[1.02] active:scale-95 shadow-xl"
+                    >
                       <span>VER DETALHES</span>
                       <ExternalLink className="h-5 w-5" />
                     </button>
@@ -395,7 +391,6 @@ export default function PartnersPage() {
             </div>
           )}
 
-          {/* Load More Button */}
           {sortedPartners.length > 0 && (
             <div className="text-center mt-20">
               <button className="relative group overflow-hidden bg-transparent border-2 border-white/20 hover:border-[#FF3131] py-5 px-12 rounded-full transition-all">
@@ -406,6 +401,93 @@ export default function PartnersPage() {
           )}
         </div>
       </div>
+
+      {selectedPartner && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={closePartnerDetails}>
+          <div className="bg-zinc-900 border border-white/10 rounded-[32px] max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 relative shadow-2xl" onClick={e => e.stopPropagation()}>
+            <button
+              onClick={closePartnerDetails}
+              className="absolute top-4 right-4 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+            >
+              <ExternalLink className="h-5 w-5 text-gray-400 rotate-45" />
+            </button>
+
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="w-full md:w-1/3">
+                <img
+                  src={selectedPartner.logo_url || `https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=logo for ${encodeURIComponent(selectedPartner.company_name || '')}&image_size=square`}
+                  alt={selectedPartner.company_name}
+                  className="w-full aspect-square object-cover rounded-2xl bg-black/50"
+                />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase leading-none mb-2">
+                  {selectedPartner.company_name || selectedPartner.name}
+                </h2>
+                <span className="inline-block px-3 py-1 bg-[#FF3131] text-black text-[10px] font-black uppercase tracking-widest rounded-lg mb-6">
+                  {selectedPartner.category}
+                </span>
+
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-2">Sobre</h4>
+                    <p className="text-gray-300 leading-relaxed">
+                      {selectedPartner.description || selectedPartner.notes || "Sem descrição disponível."}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <h4 className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Localização</h4>
+                      <p className="text-white font-medium">
+                        {selectedPartner.address && typeof selectedPartner.address === 'object'
+                          ? `${selectedPartner.address.street}, ${selectedPartner.address.city || ''} - ${selectedPartner.address.state || ''}`
+                          : (typeof selectedPartner.address === 'string' ? selectedPartner.address : 'Endereço não informado')}
+                      </p>
+                    </div>
+
+                    {(selectedPartner.contact_phone || selectedPartner.phone) && (
+                      <div>
+                        <h4 className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Contato</h4>
+                        <p className="text-white font-medium">{formatPhone(selectedPartner.contact_phone || selectedPartner.phone || '')}</p>
+                      </div>
+                    )}
+
+                    {(selectedPartner.contact_email || selectedPartner.email) && (
+                      <div>
+                        <h4 className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Email</h4>
+                        <p className="text-white font-medium">{selectedPartner.contact_email || selectedPartner.email}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {selectedPartner.contract_url && (
+                    <div className="pt-4 border-t border-white/5">
+                      <a
+                        href={selectedPartner.contract_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center text-[#FF3131] hover:underline font-bold text-sm"
+                      >
+                        Ver contrato/documentos <ExternalLink className="ml-2 h-4 w-4" />
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-white/5 flex justify-end">
+              <button
+                onClick={closePartnerDetails}
+                className="px-6 py-3 bg-white text-black font-black uppercase tracking-widest rounded-xl hover:bg-gray-200 transition-colors"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }
