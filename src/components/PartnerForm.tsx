@@ -12,6 +12,7 @@ interface PartnerFormData {
   contact_phone: string;
   notes: string;
   contract_url?: string;
+  logo_url?: string;
   approval_status: 'pending_documentation' | 'approved' | 'rejected';
   document_status: 'missing' | 'uploaded' | 'verified';
 }
@@ -38,6 +39,7 @@ export default function PartnerForm({
     contact_phone: partner?.contact_phone || '',
     notes: partner?.notes || '',
     contract_url: partner?.contract_url || '',
+    logo_url: partner?.logo_url || '',
     approval_status: partner?.approval_status || 'pending_documentation',
     document_status: partner?.document_status || 'missing'
   });
@@ -244,6 +246,26 @@ export default function PartnerForm({
               <option value="approved">Aprovado</option>
               <option value="rejected">Rejeitado</option>
             </select>
+          </div>
+
+          {/* Upload de Logo */}
+          <div>
+            <FileUpload
+              onUploadComplete={(url) => {
+                setFormData(prev => ({ ...prev, logo_url: url }));
+                toast.success('Logo enviado com sucesso!');
+              }}
+              onUploadError={(error) => toast.error(`Erro no upload do logo: ${error}`)}
+              currentFile={formData.logo_url}
+              onRemoveFile={() => {
+                setFormData(prev => ({ ...prev, logo_url: '' }));
+                toast.info('Logo removido');
+              }}
+              disabled={loading}
+              label="Logo da Empresa"
+              description="Faça upload do logo da empresa (JPG, PNG)"
+              accept=".jpg,.jpeg,.png,.webp"
+            />
           </div>
 
           {/* Upload de Contrato */}
