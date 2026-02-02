@@ -13,6 +13,7 @@ import plansRoutes from './routes/plans.js';
 import usersRoutes from './routes/users.js';
 import subscriptionsRoutes from './routes/subscriptions.js';
 import publicRoutes from './routes/public.js';
+import uploadRoutes from './routes/upload.js';
 
 // for esm mode
 const __filename = fileURLToPath(import.meta.url);
@@ -20,7 +21,6 @@ const __dirname = path.dirname(__filename);
 
 // load env
 dotenv.config();
-
 
 const app: express.Application = express();
 
@@ -37,6 +37,12 @@ app.use('/api/plans', plansRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/subscriptions', subscriptionsRoutes);
 app.use('/api/public', publicRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// Servir arquivos estáticos de uploads
+// Nota: Em produção no Coolify, garanta que a pasta uploads seja persistente (volume)
+const uploadsPath = path.join(process.cwd(), 'uploads');
+app.use('/uploads', express.static(uploadsPath));
 
 /**
  * health

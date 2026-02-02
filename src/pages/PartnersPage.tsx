@@ -14,6 +14,7 @@ import {
   Share2,
   ExternalLink
 } from 'lucide-react';
+import { api } from '../lib/api';
 import { supabase } from '../lib/supabase';
 import { Partner } from '../lib/supabase';
 import { toast } from 'sonner';
@@ -56,19 +57,15 @@ export default function PartnersPage() {
   const fetchPartners = async () => {
     try {
       setLoading(true);
-      // Buscar TODOS os parceiros sem filtro para evitar erro 400
-      const { data, error } = await supabase
-        .from('partners')
-        .select('*')
-        .order('company_name');
+      // Buscar TODOS os parceiros via API própria
+      const data = await api.partners.list();
 
-      if (error) {
-        console.error('Supabase error:', error);
+      if (!data) {
         toast.error('Erro ao carregar parceiros');
       } else {
-        // Filtrar apenas os aprovados no JavaScript
+        // Filtrar apenas os aprovados no JavaScript (caso a API retorne todos)
         const approvedPartners = (data || []).filter(
-          p => p.approval_status === 'approved'
+          (p: Partner) => p.approval_status === 'approved'
         );
         console.log('Total partners:', data?.length, 'Approved:', approvedPartners.length);
         setPartners(approvedPartners);
