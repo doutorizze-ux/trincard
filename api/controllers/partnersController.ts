@@ -63,14 +63,24 @@ export const createPartner = async (req: Request, res: Response) => {
 // Atualizar parceiro
 export const updatePartner = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const updates = req.body; // Cuidado: Em produção deve-se validar os campos permitidos
+    const updates = req.body;
 
-    // Construir query dinâmica
-    const fields = Object.keys(updates);
-    const values = Object.values(updates);
+    // Lista de campos permitidos para atualização
+    const ALLOWED_FIELDS = [
+        'company_name', 'category', 'address', 'contact_info',
+        'percentage', 'contact_email', 'contact_phone', 'notes',
+        'contract_url', 'approval_status', 'document_status',
+        'logo_url', 'description', 'city'
+    ];
+
+    // Filtrar apenas campos permitidos e remover updated_at se vier no body
+    const fields = Object.keys(updates).filter(key =>
+        ALLOWED_FIELDS.includes(key) && key !== 'updated_at' && key !== 'id'
+    );
+    const values = fields.map(key => updates[key]);
 
     if (fields.length === 0) {
-        return res.status(400).json({ error: 'Nenhum campo para atualizar' });
+        return res.status(400).json({ error: 'Nenhum campo válido para atualizar' });
     }
 
     const setClause = fields.map((field, index) => `${field} = $${index + 2}`).join(', ');
@@ -86,9 +96,13 @@ export const updatePartner = async (req: Request, res: Response) => {
         }
 
         res.json(rows[0]);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Erro ao atualizar parceiro:', error);
-        res.status(500).json({ error: 'Erro ao atualizar parceiro' });
+        // Retornar detalhes do erro para facilitar debug (remover em produção se necessário)
+        res.status(500).json({
+            error: 'Erro ao atualizar parceiro',
+            details: error.message
+        });
     }
 };
 
