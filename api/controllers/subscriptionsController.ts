@@ -57,6 +57,7 @@ export const activateFreeSubscription = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Plano não encontrado' });
         }
         const plan = planResult.rows[0];
+        const planName = plan.name || '';
 
         if (Number(plan.price) > 0) {
             return res.status(400).json({ error: 'Este plano não é gratuito. Use o checkout normal.' });
@@ -68,9 +69,18 @@ export const activateFreeSubscription = async (req: Request, res: Response) => {
             [userId]
         );
 
-        const startDate = new Date().toISOString();
+        let durationDays = 30; // Padrão Mensal
+        if (planName.toLowerCase().includes('anual')) {
+            durationDays = 365;
+        } else if (planName.toLowerCase().includes('semestral')) {
+            durationDays = 180;
+        }
+
+        const startDate = new Date();
         const endDate = new Date();
-        endDate.setDate(endDate.getDate() + 30);
+        endDate.setDate(startDate.getDate() + durationDays);
+
+        const startDateIso = startDate.toISOString();
         const endDateIso = endDate.toISOString();
 
         // Gerar um código de barras aleatório de 12 dígitos
@@ -97,7 +107,7 @@ export const activateFreeSubscription = async (req: Request, res: Response) => {
             planId,
             barcode,
             endDateIso,
-            startDate,
+            startDateIso,
             endDateIso
         ]);
 

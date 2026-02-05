@@ -12,7 +12,7 @@ export const handleAsaasWebhook = async (req: Request, res: Response) => {
         return res.status(401).json({ error: 'Não autorizado' });
     }
 
-    const { event, payment } = req.json || req.body;
+    const { event, payment } = req.body;
 
     console.log(`Evento recebido do Asaas: ${event}`, { paymentId: payment?.id, externalReference: payment?.externalReference });
 
@@ -39,16 +39,29 @@ export const handleAsaasWebhook = async (req: Request, res: Response) => {
             try {
                 await client.query('BEGIN');
 
+                // 2.1 Buscar detalhes do plano para calcular a duração exata
+                const planResult = await client.query('SELECT name FROM plans WHERE id = $1', [actualPlanId]);
+                const planName = planResult.rows[0]?.name || '';
+
+                let durationDays = 30; // Padrão Mensal
+                if (planName.toLowerCase().includes('anual')) {
+                    durationDays = 365;
+                } else if (planName.toLowerCase().includes('semestral')) {
+                    durationDays = 180;
+                }
+
                 // 3. Cancelar assinaturas ativas anteriores para evitar duplicidade
                 await client.query(
                     "UPDATE subscriptions SET status = 'cancelled', updated_at = NOW() WHERE user_id = $1 AND status = 'active'",
                     [actualUserId]
                 );
 
-                // 4. Calcular datas
-                const startDate = new Date().toISOString();
+                // 4. Calcular datas com precisão
+                const startDate = new Date();
                 const endDate = new Date();
-                endDate.setDate(endDate.getDate() + 30);
+                endDate.setDate(startDate.getDate() + durationDays);
+
+                const startDateIso = startDate.toISOString();
                 const endDateIso = endDate.toISOString();
 
                 // 5. Gerar código de barras único
@@ -63,7 +76,7 @@ export const handleAsaasWebhook = async (req: Request, res: Response) => {
                     RETURNING id
                 `;
                 const subResult = await client.query(insertSubQuery, [
-                    actualUserId, actualPlanId, barcode, endDateIso, startDate, endDateIso
+                    actualUserId, actualPlanId, barcode, endDateIso, startDateIso, endDateIso
                 ]);
 
                 // 7. Registrar o pagamento
