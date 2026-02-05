@@ -8,9 +8,13 @@ export const createCheckout = async (req: Request, res: Response) => {
         const ASAAS_API_KEY = process.env.ASAAS_API_KEY;
         const ASAAS_URL = process.env.ASAAS_API_URI || process.env.ASAAS_URL || 'https://www.asaas.com/api/v3';
 
+        // Debug: Listar chaves ASAAS disponíveis
+        const availableKeys = Object.keys(process.env).filter(k => k.startsWith('ASAAS'));
+        console.log('Chaves ASAAS detectadas no ambiente:', availableKeys);
+
         if (!ASAAS_API_KEY) {
-            console.error("ERRO: ASAAS_API_KEY não encontrada nas variáveis de ambiente.");
-            return res.status(500).json({ error: "Erro de configuração no servidor de pagamentos." });
+            console.error("ERRO: ASAAS_API_KEY não encontrada nas variáveis de ambiente. Chaves disponíveis:", availableKeys);
+            return res.status(500).json({ error: "Erro de configuração no servidor de pagamentos. Verifique as variáveis no Coolify." });
         }
 
         const headers: Record<string, string> = {
