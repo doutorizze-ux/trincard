@@ -15,6 +15,7 @@ import subscriptionsRoutes from './routes/subscriptions.js';
 import publicRoutes from './routes/public.js';
 import uploadRoutes from './routes/upload.js';
 import webhookRoutes from './routes/webhooks.js';
+import checkoutRoutes from './routes/checkout.js';
 
 // for esm mode
 const __filename = fileURLToPath(import.meta.url);
@@ -40,6 +41,7 @@ app.use('/api/subscriptions', subscriptionsRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/webhooks', webhookRoutes);
+app.use('/api/checkout', checkoutRoutes);
 
 // Servir arquivos estáticos de uploads
 // Nota: Em produção no Coolify, garanta que a pasta uploads seja persistente (volume)

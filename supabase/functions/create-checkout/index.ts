@@ -14,13 +14,16 @@ serve(async (req) => {
     try {
         const { planId, userId, price, title, userEmail, name, cpfCnpj, frontendUrl } = await req.json()
 
-        // 1. Configuração do ASAAS
-        // Recomendado: Usar Deno.env.get("ASAAS_API_KEY") após configurar no painel do Supabase
-        const ASAAS_API_KEY = '$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmMxNmU4NWY2LTVhNjEtNGYyYS05OTdjLWIzNGM5Yjk3ZDBjMzo6JGFhY2hfZGExOTkyOTMtNzY1Yy00YWUwLTg5MGItNmFkYzY1NWY3ZDMx';
-        const ASAAS_URL = 'https://sandbox.asaas.com/api/v3';
+        // 1. Configuração do ASAAS via Variáveis de Ambiente (Configurar no Painel do Supabase)
+        const ASAAS_API_KEY = Deno.env.get("ASAAS_API_KEY");
+        const ASAAS_URL = Deno.env.get("ASAAS_URL") || 'https://www.asaas.com/api/v3';
 
         if (!ASAAS_API_KEY) {
-            throw new Error("ASAAS_API_KEY não configurada.");
+            console.error("ERRO: ASAAS_API_KEY não configurada no Supabase.");
+            return new Response(JSON.stringify({ error: "Erro de configuração no servidor." }), {
+                status: 500,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
         }
 
         const headers = {

@@ -127,3 +127,28 @@ export const activateFreeSubscription = async (req: Request, res: Response) => {
         });
     }
 };
+
+export const cancelSubscription = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const userId = (req as any).user?.id;
+
+    if (!userId) {
+        return res.status(401).json({ error: 'Não autorizado' });
+    }
+
+    try {
+        const result = await pool.query(
+            "UPDATE subscriptions SET status = 'cancelled', updated_at = NOW() WHERE id = $1 AND user_id = $2 RETURNING *",
+            [id, userId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Assinatura não encontrada ou não pertence ao usuário' });
+        }
+
+        res.json({ message: 'Assinatura cancelada com sucesso', subscription: result.rows[0] });
+    } catch (error) {
+        console.error('Erro ao cancelar assinatura:', error);
+        res.status(500).json({ error: 'Erro ao cancelar assinatura' });
+    }
+};

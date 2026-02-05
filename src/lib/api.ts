@@ -43,6 +43,7 @@ export const api = {
         list: () => request('/users'),
         update: (id: string, data: any) => request(`/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
         delete: (id: string) => request(`/users/${id}`, { method: 'DELETE' }),
+        updatePassword: (password: string) => request('/auth/password', { method: 'PUT', body: JSON.stringify({ password }) }),
     },
     subscriptions: {
         list: () => request('/subscriptions'),
@@ -51,6 +52,10 @@ export const api = {
             method: 'POST',
             body: JSON.stringify({ planId })
         }),
+        cancel: (id: string) => request(`/subscriptions/${id}`, { method: 'DELETE' }),
+    },
+    checkout: {
+        create: (data: any) => request('/checkout/create', { method: 'POST', body: JSON.stringify(data) }),
     },
     // Helper para formatar URLs de imagens/arquivos vindos do servidor
     getFileUrl: (path: string) => {

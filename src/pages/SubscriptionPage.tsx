@@ -23,7 +23,6 @@ import {
   Trophy
 } from 'lucide-react';
 import { api } from '../lib/api';
-import { supabase } from '../lib/supabase';
 import { Plan, Subscription } from '../lib/supabase';
 import { toast } from 'sonner';
 import { SkeletonCard } from '../components/Skeleton';
@@ -142,27 +141,17 @@ export default function SubscriptionPage() {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          planId: plan.id,
-          userId: userId, // ADICIONADO: Necessário para o Webhook vincular o pagamento ao usuário
-          title: `Trincard - Plano ${plan.name}`,
-          price: plan.price,
-          userEmail: userEmail,
-          name: userProfile?.full_name || 'Cliente Trincard',
-          cpfCnpj: userProfile?.cpf || '',
-          frontendUrl: window.location.origin
-        }
+      const data = await api.checkout.create({
+        planId: plan.id,
+        userId: userId,
+        title: `Trincard - Plano ${plan.name}`,
+        price: plan.price,
+        userEmail: userEmail,
+        name: userProfile?.full_name || 'Cliente Trincard',
+        cpfCnpj: userProfile?.cpf || '',
+        frontendUrl: window.location.origin
       });
 
-      if (error) {
-        let errorMessage = error.message || 'Falha ao iniciar pagamento';
-        if (error.context && error.context.json) {
-          const body = await error.context.json();
-          errorMessage = body.message || JSON.stringify(body);
-        }
-        throw new Error(errorMessage);
-      }
 
       if (data && data.init_point) {
         window.location.href = data.init_point;
@@ -196,19 +185,11 @@ export default function SubscriptionPage() {
     if (!confirmed) return;
 
     try {
-      const { error } = await supabase
-        .from('subscriptions')
-        .update({ status: 'cancelled' })
-        .eq('id', currentSubscription.id);
-
-      if (error) {
-        toast.error('Erro ao cancelar assinatura');
-      } else {
-        toast.success('Assinatura cancelada com sucesso');
-        setCurrentSubscription(null);
-      }
-    } catch (error) {
-      toast.error('Erro inesperado');
+      await api.subscriptions.cancel(currentSubscription.id);
+      toast.success('Assinatura cancelada com sucesso');
+      setCurrentSubscription(null);
+    } catch (error: any) {
+      toast.error(`Erro ao cancelar: ${error.message}`);
     }
   };
 

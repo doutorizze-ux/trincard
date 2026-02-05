@@ -18,7 +18,7 @@ import {
   Zap
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import { Plan } from '../lib/supabase';
 
 interface FormData {
@@ -91,19 +91,11 @@ export default function RegisterPage() {
 
   const fetchPlans = async () => {
     try {
-      const { data, error } = await supabase
-        .from('plans')
-        .select('*')
-        .eq('is_active', true)
-        .order('price');
-
-      if (error) {
-        console.error('Error fetching plans:', error);
-      } else {
-        setPlans(data || []);
-        if (data && data.length > 0) {
-          setFormData(prev => ({ ...prev, selectedPlan: data[0].id }));
-        }
+      const data = await api.plans.list();
+      const activePlans = data.filter((p: any) => p.is_active).sort((a: any, b: any) => a.price - b.price);
+      setPlans(activePlans || []);
+      if (activePlans && activePlans.length > 0) {
+        setFormData(prev => ({ ...prev, selectedPlan: activePlans[0].id }));
       }
     } catch (error) {
       console.error('Error fetching plans:', error);
@@ -285,10 +277,9 @@ export default function RegisterPage() {
           toast.error(error.message);
           setIsRateLimited(true);
           setRateLimitCountdown(60); // 60 segundos de bloqueio
-        } else if (error.message.includes('already registered')) {
-          toast.error('Este email já está cadastrado');
         } else {
-          toast.error('Erro ao criar conta. Tente novamente.');
+          // Exibe a mensagem real vinda do backend (ex: "User already exists")
+          toast.error(error.message || 'Erro ao criar conta. Tente novamente.');
         }
       } else {
         toast.success('Conta criada com sucesso! Verifique seu email se o login não foi automático.');

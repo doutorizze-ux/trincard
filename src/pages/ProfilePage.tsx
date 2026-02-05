@@ -24,7 +24,7 @@ import {
   CheckCircle,
   Smartphone
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 
@@ -134,11 +134,7 @@ export default function ProfilePage() {
 
     try {
       setLoading(true);
-      const { error } = await supabase.auth.updateUser({
-        password: passwordData.newPassword
-      });
-
-      if (error) throw error;
+      await api.users.updatePassword(passwordData.newPassword);
 
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       toast.success('Senha alterada com sucesso!');

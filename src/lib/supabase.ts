@@ -1,15 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
+// Este arquivo agora contém apenas tipos/interfaces para o sistema.
+// O Supabase foi descontinuado em favor da API própria no Coolify.
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
-// Tipos para o banco de dados
 export interface User {
   id: string
   email: string

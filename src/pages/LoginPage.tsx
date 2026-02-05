@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useSafeTimeout } from '../hooks/useSafeTimeout';
-import { supabase } from '../lib/supabase';
 import { Eye, EyeOff, Mail, Lock, LogIn, ArrowLeft, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -60,35 +59,18 @@ export default function LoginPage() {
       } else {
         toast.success('Login realizado com sucesso!');
 
-        // Aguardar um momento para o userProfile ser carregado e verificar se é admin
-        setSafeTimeout(async () => {
-          try {
-            // Buscar o perfil atualizado diretamente do banco
-            const { data: { user } } = await supabase.auth.getUser();
+        // Aguardar um momento para o userProfile ser carregado e redirecionar
+        setSafeTimeout(() => {
+          // O AuthContext já atualiza o userProfile após o login de sucesso
+          // Mas podemos pegar do localStorage se quisermos garantir imediatismo ou confiar no profile retornado
+          const storedUser = localStorage.getItem('user');
+          const profile = storedUser ? JSON.parse(storedUser) : null;
 
-            if (user) {
-              const { data: profile } = await supabase
-                .from('users')
-                .select('is_admin')
-                .eq('id', user.id)
-                .single();
-
-              console.log('🔍 Perfil após login:', profile);
-              console.log('👑 Is Admin:', profile?.is_admin);
-
-              // Verificar se o usuário é admin e redirecionar adequadamente
-              if (profile?.is_admin) {
-                console.log('🚀 Redirecionando para /admin');
-                navigate('/admin', { replace: true });
-              } else {
-                console.log('🚀 Redirecionando para', from);
-                navigate(from, { replace: true });
-              }
-            } else {
-              navigate(from, { replace: true });
-            }
-          } catch (profileError) {
-            console.error('❌ Erro ao buscar perfil após login:', profileError);
+          if (profile?.is_admin) {
+            console.log('🚀 Redirecionando para /admin');
+            navigate('/admin', { replace: true });
+          } else {
+            console.log('🚀 Redirecionando para', from);
             navigate(from, { replace: true });
           }
         }, 500);
