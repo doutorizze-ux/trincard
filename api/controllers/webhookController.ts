@@ -48,6 +48,8 @@ export const handleAsaasWebhook = async (req: Request, res: Response) => {
                     durationDays = 365;
                 } else if (planName.toLowerCase().includes('semestral')) {
                     durationDays = 180;
+                } else if (planName.toLowerCase().includes('trimestral')) {
+                    durationDays = 90;
                 }
 
                 // 3. Cancelar assinaturas ativas anteriores para evitar duplicidade

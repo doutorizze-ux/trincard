@@ -39,6 +39,7 @@ export default function SubscriptionPage() {
   const [processingPayment, setProcessingPayment] = useState(false);
   const [paymentData, setPaymentData] = useState<any>(null);
   const [checkoutStep, setCheckoutStep] = useState<'options' | 'pix' | 'credit_card'>('options');
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [cardData, setCardData] = useState({
     holderName: '',
     number: '',
@@ -339,7 +340,22 @@ export default function SubscriptionPage() {
             <div className="mb-20">
               <div className="text-center mb-16">
                 <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase mb-4">EVOLUA SEU STATUS</h2>
-                <div className="w-24 h-1 bg-[#FF3131] mx-auto rounded-full"></div>
+                <div className="w-24 h-1 bg-[#FF3131] mx-auto rounded-full mb-10"></div>
+
+                {/* Billing Cycle Toggle */}
+                <div className="flex items-center justify-center space-x-6">
+                  <span className={`text-xs font-black uppercase tracking-widest transition-all ${billingCycle === 'monthly' ? 'text-white' : 'text-gray-600'}`}>Mensal</span>
+                  <button
+                    onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
+                    className="w-16 h-8 bg-zinc-800 rounded-full relative p-1 transition-all border border-white/5"
+                  >
+                    <div className={`w-6 h-6 bg-[#FF3131] rounded-full transition-all duration-300 transform ${billingCycle === 'yearly' ? 'translate-x-8' : 'translate-x-0'}`}></div>
+                  </button>
+                  <div className="flex items-center space-x-2">
+                    <span className={`text-xs font-black uppercase tracking-widest transition-all ${billingCycle === 'yearly' ? 'text-white' : 'text-gray-600'}`}>Anual</span>
+                    <span className="bg-[#BFFF00] text-black text-[8px] font-black px-2 py-0.5 rounded-full uppercase italic">Economize 20%</span>
+                  </div>
+                </div>
               </div>
 
               {loadingPlans ? (
@@ -348,77 +364,83 @@ export default function SubscriptionPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                  {plans.map((plan) => {
-                    const featuresList = plan.features?.features || [];
-                    const planName = plan.name || '';
-                    const isPopular = plan.features?.exclusive_benefits || planName.toLowerCase().includes('premium');
-                    const planPrice = Number(plan.price) || 0;
+                  {plans
+                    .filter(p => {
+                      const name = p.name.toLowerCase();
+                      if (billingCycle === 'yearly') return name.includes('anual');
+                      return !name.includes('anual') && !name.includes('semestral') && !name.includes('trimestral');
+                    })
+                    .map((plan) => {
+                      const featuresList = plan.features?.features || [];
+                      const planName = plan.name || '';
+                      const isPopular = plan.features?.exclusive_benefits || planName.toLowerCase().includes('premium');
+                      const planPrice = Number(plan.price) || 0;
 
-                    return (
-                      <div
-                        key={plan.id}
-                        className={`group bg-zinc-900 rounded-[48px] border-2 transition-all duration-500 overflow-hidden flex flex-col ${isPopular
-                          ? 'border-[#FF3131] shadow-[0_20px_60px_rgba(191,255,0,0.15)] scale-[1.05] z-10'
-                          : 'border-white/5 hover:border-white/20'
-                          }`}
-                      >
-                        {isPopular && (
-                          <div className="bg-[#FF3131] text-black text-center py-2 font-black uppercase tracking-[0.3em] text-[10px] italic">
-                            🏆 A ESCOLHA DOS ATLETAS 🏆
-                          </div>
-                        )}
-
-                        <div className="p-10 flex-1 flex flex-col">
-                          <div className="flex justify-between items-start mb-8">
-                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all ${isPopular ? 'bg-[#FF3131] text-black shadow-lg shadow-[#FF3131]/20' : 'bg-white/5 text-gray-400 group-hover:text-white'}`}>
-                              {getPlanIcon(planName)}
+                      return (
+                        <div
+                          key={plan.id}
+                          className={`group bg-zinc-900 rounded-[48px] border-2 transition-all duration-500 overflow-hidden flex flex-col ${isPopular
+                            ? 'border-[#FF3131] shadow-[0_20px_60px_rgba(191,255,0,0.15)] scale-[1.05] z-10'
+                            : 'border-white/5 hover:border-white/20'
+                            }`}
+                        >
+                          {isPopular && (
+                            <div className="bg-[#FF3131] text-black text-center py-2 font-black uppercase tracking-[0.3em] text-[10px] italic">
+                              🏆 A ESCOLHA DOS ATLETAS 🏆
                             </div>
-                          </div>
+                          )}
 
-                          <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase mb-2">{planName}</h3>
-                          <p className="text-gray-500 font-bold mb-8 text-sm uppercase tracking-widest">{plan.description}</p>
-
-                          <div className="mb-10">
-                            <div className="flex items-baseline space-x-1">
-                              <span className={`text-5xl font-black italic tracking-tighter transition-colors ${isPopular ? 'text-[#FF3131]' : 'text-white'}`}>
-                                {formatCurrency(planPrice).split(',')[0]}
-                              </span>
-                              {formatCurrency(planPrice).includes(',') && (
-                                <span className="text-xl font-black text-gray-600">
-                                  ,{formatCurrency(planPrice).split(',')[1]}
-                                </span>
-                              )}
-                              <span className="text-xs font-black text-gray-500 uppercase tracking-widest ml-2">/ CICLO</span>
-                            </div>
-                          </div>
-
-                          <div className="space-y-4 mb-10 flex-1">
-                            {featuresList.map((feature: any, idx: number) => (
-                              <div key={idx} className="flex items-center space-x-3">
-                                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${isPopular ? 'bg-[#FF3131]' : 'bg-white/10'}`}>
-                                  <CheckCircle className={`h-3 w-3 ${isPopular ? 'text-black' : 'text-gray-400'}`} />
-                                </div>
-                                <span className="text-sm font-bold text-gray-400 uppercase tracking-tight">{typeof feature === 'string' ? feature : String(feature)}</span>
+                          <div className="p-10 flex-1 flex flex-col">
+                            <div className="flex justify-between items-start mb-8">
+                              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all ${isPopular ? 'bg-[#FF3131] text-black shadow-lg shadow-[#FF3131]/20' : 'bg-white/5 text-gray-400 group-hover:text-white'}`}>
+                                {getPlanIcon(planName)}
                               </div>
-                            ))}
-                            {featuresList.length === 0 && (
-                              <p className="text-gray-600 text-sm italic">Sem detalhes adicionais</p>
-                            )}
-                          </div>
+                            </div>
 
-                          <button
-                            onClick={() => handlePlanSelection(plan.id)}
-                            className={`w-full py-5 rounded-3xl font-black italic uppercase tracking-widest text-sm transition-all transform active:scale-95 shadow-xl ${isPopular
-                              ? 'bg-[#FF3131] text-black hover:bg-white shadow-[#FF3131]/10'
-                              : 'bg-white/5 text-white hover:bg-white hover:text-black border border-white/10'
-                              }`}
-                          >
-                            SELECIONAR PLANO
-                          </button>
+                            <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase mb-2">{planName}</h3>
+                            <p className="text-gray-500 font-bold mb-8 text-sm uppercase tracking-widest">{plan.description}</p>
+
+                            <div className="mb-10">
+                              <div className="flex items-baseline space-x-1">
+                                <span className={`text-5xl font-black italic tracking-tighter transition-colors ${isPopular ? 'text-[#FF3131]' : 'text-white'}`}>
+                                  {formatCurrency(planPrice).split(',')[0]}
+                                </span>
+                                {formatCurrency(planPrice).includes(',') && (
+                                  <span className="text-xl font-black text-gray-600">
+                                    ,{formatCurrency(planPrice).split(',')[1]}
+                                  </span>
+                                )}
+                                <span className="text-xs font-black text-gray-500 uppercase tracking-widest ml-2">/ CICLO</span>
+                              </div>
+                            </div>
+
+                            <div className="space-y-4 mb-10 flex-1">
+                              {featuresList.map((feature: any, idx: number) => (
+                                <div key={idx} className="flex items-center space-x-3">
+                                  <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${isPopular ? 'bg-[#FF3131]' : 'bg-white/10'}`}>
+                                    <CheckCircle className={`h-3 w-3 ${isPopular ? 'text-black' : 'text-gray-400'}`} />
+                                  </div>
+                                  <span className="text-sm font-bold text-gray-400 uppercase tracking-tight">{typeof feature === 'string' ? feature : String(feature)}</span>
+                                </div>
+                              ))}
+                              {featuresList.length === 0 && (
+                                <p className="text-gray-600 text-sm italic">Sem detalhes adicionais</p>
+                              )}
+                            </div>
+
+                            <button
+                              onClick={() => handlePlanSelection(plan.id)}
+                              className={`w-full py-5 rounded-3xl font-black italic uppercase tracking-widest text-sm transition-all transform active:scale-95 shadow-xl ${isPopular
+                                ? 'bg-[#FF3131] text-black hover:bg-white shadow-[#FF3131]/10'
+                                : 'bg-white/5 text-white hover:bg-white hover:text-black border border-white/10'
+                                }`}
+                            >
+                              SELECIONAR PLANO
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </div>
               )}
             </div>
