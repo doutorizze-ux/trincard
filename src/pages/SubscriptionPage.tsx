@@ -145,10 +145,11 @@ export default function SubscriptionPage() {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           planId: plan.id,
-          title: ` - Plano ${plan.name}`,
+          userId: userId, // ADICIONADO: Necessário para o Webhook vincular o pagamento ao usuário
+          title: `Trincard - Plano ${plan.name}`,
           price: plan.price,
           userEmail: userEmail,
-          name: userProfile?.full_name || 'Cliente ',
+          name: userProfile?.full_name || 'Cliente Trincard',
           cpfCnpj: userProfile?.cpf || '',
           frontendUrl: window.location.origin
         }

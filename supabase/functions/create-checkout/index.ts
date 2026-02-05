@@ -12,10 +12,10 @@ serve(async (req) => {
     }
 
     try {
-        const { planId, price, title, userEmail, name, cpfCnpj, frontendUrl } = await req.json()
+        const { planId, userId, price, title, userEmail, name, cpfCnpj, frontendUrl } = await req.json()
 
         // 1. Configuração do ASAAS
-        // HARDCODED TEMPORARIAMENTE PARA TESTE (O secret está demorando a propagar)
+        // Recomendado: Usar Deno.env.get("ASAAS_API_KEY") após configurar no painel do Supabase
         const ASAAS_API_KEY = '$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmMxNmU4NWY2LTVhNjEtNGYyYS05OTdjLWIzNGM5Yjk3ZDBjMzo6JGFhY2hfZGExOTkyOTMtNzY1Yy00YWUwLTg5MGItNmFkYzY1NWY3ZDMx';
         const ASAAS_URL = 'https://sandbox.asaas.com/api/v3';
 
@@ -46,10 +46,10 @@ serve(async (req) => {
                 method: 'POST',
                 headers,
                 body: JSON.stringify({
-                    name: name || 'Novo Cliente',
+                    name: name || 'Cliente Trincard',
                     email: userEmail,
                     cpfCnpj: cleanCpf,
-                    notificationDisabled: false // Permitir que Asaas envie email/zap
+                    notificationDisabled: false
                 })
             });
             const newCustomer = await newCustomerRes.json();
@@ -60,15 +60,16 @@ serve(async (req) => {
             customerId = newCustomer.id;
         }
 
-        // 3. Criar Assinatura
+        // 3. Criar Cobrança (Assinatura no Asaas cria cobranças automáticas)
+        // Usamos externalReference para levar a chave "userId:planId"
         const subscriptionPayload = {
             customer: customerId,
-            billingType: "UNDEFINED", // Deixa o usuario escolher (Pix/Boleto/Cartao) no checkout
+            billingType: "UNDEFINED",
             value: Number(price),
-            nextDueDate: new Date().toISOString().split('T')[0], // Hoje, para habilitar Pix imediato
+            nextDueDate: new Date().toISOString().split('T')[0],
             cycle: "MONTHLY",
             description: title,
-            externalReference: planId
+            externalReference: `${userId}:${planId}` // FORMATO CRÍTICO PARA O WEBHOOK
         };
 
         const subRes = await fetch(`${ASAAS_URL}/subscriptions`, {
