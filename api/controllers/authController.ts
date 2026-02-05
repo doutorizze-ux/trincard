@@ -9,7 +9,7 @@ import pool from '../config/db.js';
 const JWT_SECRET = process.env.JWT_SECRET || 'trincard-secret-key-change-this-in-prod';
 
 export const register = async (req: Request, res: Response) => {
-    const { email, password, full_name, cpf, phone } = req.body;
+    const { email, password, full_name, cpf, phone, address, card_type } = req.body;
 
     try {
         // Check if user exists
@@ -22,12 +22,12 @@ export const register = async (req: Request, res: Response) => {
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(password, salt);
 
-        // Insert user
+        // Insert user with all fields
         const newUser = await pool.query(
-            `INSERT INTO users (email, password_hash, full_name, cpf, phone) 
-       VALUES ($1, $2, $3, $4, $5) 
-       RETURNING id, email, full_name, role`,
-            [email, passwordHash, full_name, cpf, phone]
+            `INSERT INTO users (email, password_hash, full_name, cpf, phone, address, card_type) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7) 
+             RETURNING id, email, full_name, role`,
+            [email, passwordHash, full_name, cpf, phone, address, card_type]
         );
 
         const user = newUser.rows[0];

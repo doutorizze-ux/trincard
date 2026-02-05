@@ -105,8 +105,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     password,
                     full_name: userData.full_name,
                     cpf: userData.cpf,
-                    phone: userData.phone
-                    // Address is handled separately or need to update register controller to accept it
+                    phone: userData.phone,
+                    address: userData.address, // Agora envia o objeto de endereço
+                    card_type: userData.card_type // E o tipo de cartão escolhido
                 })
             });
             const data = await res.json();
