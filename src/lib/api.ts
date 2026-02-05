@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const API_BASE = import.meta.env.VITE_API_URL || '';
+const API_URL = `${API_BASE}/api`;
 
 // Função auxiliar para chamadas API
 async function request(endpoint: string, options: RequestInit = {}) {
@@ -40,6 +41,8 @@ export const api = {
     },
     users: {
         list: () => request('/users'),
+        update: (id: string, data: any) => request(`/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+        delete: (id: string) => request(`/users/${id}`, { method: 'DELETE' }),
     },
     subscriptions: {
         list: () => request('/subscriptions'),
@@ -48,5 +51,12 @@ export const api = {
             method: 'POST',
             body: JSON.stringify({ planId })
         }),
+    },
+    // Helper para formatar URLs de imagens/arquivos vindos do servidor
+    getFileUrl: (path: string) => {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        // Se começar com /uploads, garantir que pega a BASE do servidor (sem o /api)
+        return `${API_BASE}${path}`;
     }
 };

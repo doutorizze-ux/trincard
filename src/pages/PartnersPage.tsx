@@ -302,7 +302,7 @@ export default function PartnersPage() {
                   <div className={`relative overflow-hidden ${viewMode === 'list' ? 'md:w-80 flex-shrink-0' : 'h-64'
                     }`}>
                     <img
-                      src={partner.logo_url || `https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=modern business logo for ${encodeURIComponent(partner.company_name || partner.name || '')} ${encodeURIComponent(partner.category || '')}&image_size=square`}
+                      src={api.getFileUrl(partner.logo_url) || `https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=modern business logo for ${encodeURIComponent(partner.company_name || partner.name || '')} ${encodeURIComponent(partner.category || '')}&image_size=square`}
                       alt={partner.company_name || partner.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
@@ -415,7 +415,7 @@ export default function PartnersPage() {
             <div className="flex flex-col md:flex-row gap-8">
               <div className="w-full md:w-1/3">
                 <img
-                  src={selectedPartner.logo_url || `https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=logo for ${encodeURIComponent(selectedPartner.company_name || '')}&image_size=square`}
+                  src={api.getFileUrl(selectedPartner.logo_url) || `https://trae-api-us.mchost.guru/api/ide/v1/text_to_image?prompt=logo for ${encodeURIComponent(selectedPartner.company_name || '')}&image_size=square`}
                   alt={selectedPartner.company_name}
                   className="w-full aspect-square object-cover rounded-2xl bg-black/50"
                 />

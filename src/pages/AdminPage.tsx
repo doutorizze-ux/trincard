@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/Layout';
 import PartnerForm from '../components/PartnerForm';
 import PlanForm from '../components/PlanForm';
+import UserForm from '../components/UserForm';
 import { SkeletonTable, SkeletonCard } from '../components/Skeleton';
 import {
   Users,
@@ -44,7 +45,10 @@ export default function AdminPage() {
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
   const [showPlanForm, setShowPlanForm] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [editingUser, setEditingUser] = useState<any>(null);
   const [deletingPartnerId, setDeletingPartnerId] = useState<string | null>(null);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<number>(0);
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -138,6 +142,34 @@ export default function AdminPage() {
       toast.error('Erro ao atualizar status do plano');
     }
   }, [fetchData]);
+
+  const handleEditUser = (user: any) => {
+    setEditingUser(user);
+    setShowUserForm(true);
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm('ATENÇÃO: Isso excluirá o usuário permanentemente, incluindo assinaturas e históricos. Deseja continuar?')) {
+      return;
+    }
+
+    setDeletingUserId(userId);
+    try {
+      await api.users.delete(userId);
+      toast.success('Usuário removido com sucesso');
+      fetchData();
+    } catch (error: any) {
+      toast.error(`Erro ao remover usuário: ${error.message}`);
+    } finally {
+      setDeletingUserId(null);
+    }
+  };
+
+  const handleUserFormSuccess = () => {
+    setShowUserForm(false);
+    setEditingUser(null);
+    fetchData();
+  };
 
   const handleEditPartner = (partner: Partner) => {
     console.log('Editing partner:', partner);
@@ -464,8 +496,16 @@ export default function AdminPage() {
                       <div className="space-y-3">
                         {partners.filter(p => (p.approval_status as any) === 'pending_documentation').slice(0, 5).map((partner) => (
                           <div key={partner.id} className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg">
-                            <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                              <Building className="h-5 w-5 text-yellow-600" />
+                            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-200">
+                              {partner.logo_url ? (
+                                <img
+                                  src={api.getFileUrl(partner.logo_url)}
+                                  className="w-full h-full object-cover"
+                                  alt={partner.company_name}
+                                />
+                              ) : (
+                                <Building className="h-5 w-5 text-gray-400" />
+                              )}
                             </div>
                             <div className="flex-1">
                               <p className="font-medium text-gray-900">{partner.company_name}</p>
@@ -544,11 +584,24 @@ export default function AdminPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex space-x-2">
-                              <button className="text-blue-600 hover:text-blue-700">
-                                <Eye className="h-4 w-4" />
-                              </button>
-                              <button className="text-green-600 hover:text-green-700">
+                              <button
+                                onClick={() => handleEditUser(user)}
+                                className="text-blue-600 hover:text-blue-700"
+                                title="Editar usuário"
+                              >
                                 <Edit className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteUser(user.id)}
+                                disabled={deletingUserId === user.id}
+                                className={`${deletingUserId === user.id ? 'text-gray-400' : 'text-red-600 hover:text-red-700'}`}
+                                title="Excluir usuário"
+                              >
+                                {deletingUserId === user.id ? (
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                                ) : (
+                                  <Trash2 className="h-4 w-4" />
+                                )}
                               </button>
                             </div>
                           </td>
@@ -589,8 +642,16 @@ export default function AdminPage() {
                         <tr key={partner.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                <Building className="h-5 w-5 text-blue-600" />
+                              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-200">
+                                {partner.logo_url ? (
+                                  <img
+                                    src={api.getFileUrl(partner.logo_url)}
+                                    className="w-full h-full object-cover"
+                                    alt={partner.company_name}
+                                  />
+                                ) : (
+                                  <Building className="h-5 w-5 text-gray-400" />
+                                )}
                               </div>
                               <div className="ml-4">
                                 <div className="text-sm font-medium text-gray-900">{partner.company_name}</div>
@@ -605,7 +666,7 @@ export default function AdminPage() {
                             <div className="flex items-center space-x-2">
                               {partner.contract_url ? (
                                 <a
-                                  href={partner.contract_url}
+                                  href={api.getFileUrl(partner.contract_url)}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 hover:bg-green-200"
@@ -834,6 +895,18 @@ export default function AdminPage() {
           plan={editingPlan}
           onSuccess={handlePlanFormSuccess}
           onCancel={handlePlanFormCancel}
+        />
+      )}
+
+      {/* User Form Modal */}
+      {showUserForm && (
+        <UserForm
+          user={editingUser}
+          onSuccess={handleUserFormSuccess}
+          onCancel={() => {
+            setShowUserForm(false);
+            setEditingUser(null);
+          }}
         />
       )}
     </Layout>

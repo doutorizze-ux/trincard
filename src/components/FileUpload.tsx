@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, FileText, AlertCircle, CheckCircle } from 'lucide-react';
 import { uploadFile, validateFile, UploadResult } from '../lib/fileUpload';
+import { api } from '../lib/api';
 
 interface FileUploadProps {
   onUploadComplete: (url: string) => void;
@@ -44,7 +45,7 @@ export default function FileUpload({
 
     try {
       const result: UploadResult = await uploadFile(file, bucket, folder);
-      
+
       if (result.success && result.url) {
         onUploadComplete(result.url);
       } else {
@@ -67,7 +68,7 @@ export default function FileUpload({
   const handleDrop = (event: React.DragEvent) => {
     event.preventDefault();
     setDragOver(false);
-    
+
     const file = event.dataTransfer.files[0];
     if (file) {
       handleFileSelect(file);
@@ -138,7 +139,7 @@ export default function FileUpload({
           </div>
           <div className="mt-3 flex space-x-2">
             <a
-              href={currentFile}
+              href={api.getFileUrl(currentFile)}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-blue-600 hover:text-blue-800 underline"
@@ -159,11 +160,10 @@ export default function FileUpload({
       ) : (
         // Área de upload
         <div
-          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-            dragOver
-              ? 'border-blue-400 bg-blue-50'
-              : 'border-gray-300 hover:border-gray-400'
-          } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${dragOver
+            ? 'border-blue-400 bg-blue-50'
+            : 'border-gray-300 hover:border-gray-400'
+            } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
