@@ -3,8 +3,9 @@ import { User, Session } from '@supabase/supabase-js';
 import { User as AppUser } from '../lib/supabase';
 import { useSafeTimeout } from '../hooks/useSafeTimeout';
 
-// Import API URL logic implicitly or define it here
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+// Prefixar sempre com /api para bater nas rotas do backend
+const API_BASE = import.meta.env.VITE_API_URL || '';
+const API_URL = `${API_BASE}/api`;
 
 interface AuthContextType {
     user: User | null;
