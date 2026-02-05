@@ -101,6 +101,24 @@ export default function SubscriptionPage() {
     fetchData();
   }, [user]); // Run when auth user is available
 
+  // Polling para verificar se o pagamento foi confirmado
+  useEffect(() => {
+    let interval: any;
+    if (showPaymentModal && checkoutStep === 'pix') {
+      interval = setInterval(() => {
+        fetchSubscriptionOnly().then(() => {
+          if (currentSubscription && currentSubscription.status === 'active') {
+            setShowPaymentModal(false);
+            setCheckoutStep('options');
+            setPaymentData(null);
+            toast.success('Pagamento confirmado! Bem-vindo ao time de elite.');
+          }
+        });
+      }, 5000); // Verifica a cada 5 segundos
+    }
+    return () => clearInterval(interval);
+  }, [showPaymentModal, checkoutStep, currentSubscription]);
+
   // Handle payment status messages
   useEffect(() => {
     const status = searchParams.get('status');

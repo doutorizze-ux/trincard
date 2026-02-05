@@ -3,33 +3,34 @@ import { type Request, type Response } from 'express';
 import pool from '../config/db.js';
 
 export const handleAsaasWebhook = async (req: Request, res: Response) => {
+    const { event, payment } = req.body;
+
+    console.log('--- NOVO EVENTO WEBHOOK ASAAS ---');
+    console.log('Headers:', JSON.stringify(req.headers));
+    console.log('Evento:', event);
+    console.log('ExternalReference:', payment?.externalReference);
+    console.log('Webhook Token no ENV:', process.env.ASAAS_WEBHOOK_TOKEN ? 'Configurado' : 'AUSENTE');
+
     // 1. Validar Token de Segurança do Webhook (Configurado no Painel do Asaas e no .env)
     const webhookToken = process.env.ASAAS_WEBHOOK_TOKEN;
     const receivedToken = req.headers['asaas-access-token'];
 
     if (webhookToken && receivedToken !== webhookToken) {
-        console.error('Tentativa de acesso não autorizada ao webhook do Asaas');
+        console.error('ERRO: Token do Webhook não bate!', { recebido: receivedToken, esperado: webhookToken });
         return res.status(401).json({ error: 'Não autorizado' });
     }
-
-    const { event, payment } = req.body;
-
-    console.log(`Evento recebido do Asaas: ${event}`, { paymentId: payment?.id, externalReference: payment?.externalReference });
 
     // Eventos que indicam pagamento confirmado
     const successEvents = ['PAYMENT_RECEIVED', 'PAYMENT_CONFIRMED'];
 
     if (successEvents.includes(event)) {
-        const userId = payment.externalReference; // Recuperamos o ID do usuário que enviamos no checkout
-        const planId = payment.subscriptionId ? payment.externalReference.split(':')[1] : payment.externalReference;
-
         // Se enviamos "userId:planId" no externalReference para garantir
-        const parts = payment.externalReference.split(':');
+        const parts = payment.externalReference?.split(':') || [];
         const actualUserId = parts[0];
         const actualPlanId = parts[1];
 
         if (!actualUserId || !actualPlanId) {
-            console.error('Webhook: Dados do usuário ou plano não encontrados no externalReference', payment.externalReference);
+            console.error('Webhook: Dados do usuário ou plano não encontrados no externalReference', payment?.externalReference);
             return res.status(400).json({ error: 'Referência externa inválida' });
         }
 
