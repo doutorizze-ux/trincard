@@ -37,6 +37,15 @@ export default function SubscriptionPage() {
   const [paymentMethod, setPaymentMethod] = useState('credit_card');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [paymentData, setPaymentData] = useState<any>(null);
+  const [checkoutStep, setCheckoutStep] = useState<'options' | 'pix' | 'credit_card'>('options');
+  const [cardData, setCardData] = useState({
+    holderName: '',
+    number: '',
+    expiryMonth: '',
+    expiryYear: '',
+    cvv: ''
+  });
   const [searchParams] = useSearchParams();
 
   const fetchPlansOnly = async () => {
@@ -116,7 +125,7 @@ export default function SubscriptionPage() {
     }
   }, [plans, searchParams, selectedPlan, showPaymentModal, currentSubscription, handlePlanSelection]);
 
-  const handleSubscription = async (formData: any) => {
+  const handleSubscription = async (formData: any = {}) => {
     const currentUser = userProfile || user;
     const userId = currentUser?.id;
     const userEmail = currentUser?.email;
@@ -143,25 +152,36 @@ export default function SubscriptionPage() {
 
       const data = await api.checkout.create({
         planId: plan.id,
-        userId: userId,
+        userId: userProfile?.id,
         title: `Trincard - Plano ${plan.name}`,
         price: plan.price,
-        userEmail: userEmail,
+        userEmail: userProfile?.email || '',
         name: userProfile?.full_name || 'Cliente Trincard',
         cpfCnpj: userProfile?.cpf || '',
+        billingType: paymentMethod === 'pix' ? 'PIX' : 'CREDIT_CARD',
+        cardData: paymentMethod === 'credit_card' ? cardData : undefined,
         frontendUrl: window.location.origin
       });
 
-
-      if (data && data.init_point) {
+      if (data && data.pix) {
+        setPaymentData(data);
+        setCheckoutStep('pix');
+        toast.success('Pix gerado com sucesso!');
+      } else if (data && paymentMethod === 'credit_card') {
+        toast.success('Assinatura processada! Seu plano será ativado em instantes.');
+        setShowPaymentModal(false);
+        setCheckoutStep('options');
+        fetchData();
+      } else if (data && data.init_point) {
         window.location.href = data.init_point;
       } else {
-        throw new Error('Erro ao obter link de pagamento');
+        throw new Error('Erro ao obter dados de pagamento');
       }
 
     } catch (error: any) {
       console.error('Erro ao processar assinatura:', error);
       toast.error(error.message || 'Erro ao processar pagamento');
+    } finally {
       setProcessingPayment(false);
     }
   };
@@ -427,92 +447,209 @@ export default function SubscriptionPage() {
 
         {/* Payment Modal Refactored for Sporty Theme */}
         {showPaymentModal && (
-          <div className="fixed inset-0 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
+          <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
             <div className="bg-zinc-900 border border-white/10 rounded-[48px] max-w-lg w-full p-10 lg:p-12 shadow-3xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-[#FF3131] to-blue-600"></div>
 
               <div className="flex justify-between items-center mb-10">
-                <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">CHECKOUT <span className="text-[#FF3131]">ELITE</span></h3>
-                <button onClick={() => setShowPaymentModal(false)} className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-gray-500 hover:text-white transition-all">
+                <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">
+                  {checkoutStep === 'pix' ? 'PAGAMENTO PIX' : 'CHECKOUT ELITE'}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowPaymentModal(false);
+                    setCheckoutStep('options');
+                    setPaymentData(null);
+                  }}
+                  className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-gray-500 hover:text-white transition-all"
+                >
                   <XCircle className="h-6 w-6" />
                 </button>
               </div>
 
-              <div className="mb-10 bg-black/40 border border-white/5 rounded-3xl p-6">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">PLANO ESCOLHIDO</p>
-                    <span className="text-xl font-black text-white italic uppercase tracking-tight">
-                      {plans.find(p => p.id === selectedPlan)?.name}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">TOTAL</p>
-                    <span className="text-xl font-black text-[#FF3131] italic uppercase tracking-tight">
-                      {formatCurrency(plans.find(p => p.id === selectedPlan)?.price || 0)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-center py-8">
-                <div className="w-20 h-20 bg-[#FF3131]/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                  <Shield className="h-10 w-10 text-[#FF3131]" />
-                </div>
-                {Number(plans.find(p => p.id === selectedPlan)?.price || 0) > 0 ? (
-                  <>
-                    <h4 className="text-lg font-black text-white uppercase tracking-widest mb-4 italic">CRIPTOGRAFIA DE GRAU MILITAR</h4>
-                    <p className="text-gray-500 font-bold mb-8 text-sm">
-                      Você será redirecionado para o hub de pagamento seguro. Escolha sua arma:
-                    </p>
-
-                    <div className="grid grid-cols-3 gap-4 mb-10">
-                      <div className="flex flex-col items-center p-4 bg-black rounded-2xl border border-white/5">
-                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#FF3131] mb-2 font-black italic">PX</div>
-                        <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">PIX FAST</span>
+              {checkoutStep === 'options' && (
+                <>
+                  <div className="mb-10 bg-black/40 border border-white/5 rounded-3xl p-6">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">PLANO ESCOLHIDO</p>
+                        <span className="text-xl font-black text-white italic uppercase tracking-tight">
+                          {plans.find(p => p.id === selectedPlan)?.name}
+                        </span>
                       </div>
-                      <div className="flex flex-col items-center p-4 bg-black rounded-2xl border border-white/5">
-                        <CreditCard className="w-8 h-8 text-blue-500 mb-2" />
-                        <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">CREDIT</span>
-                      </div>
-                      <div className="flex flex-col items-center p-4 bg-black rounded-2xl border border-white/5">
-                        <Smartphone className="w-8 h-8 text-purple-500 mb-2" />
-                        <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">E-WALLET</span>
+                      <div className="text-right">
+                        <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">TOTAL</p>
+                        <span className="text-xl font-black text-[#FF3131] italic uppercase tracking-tight">
+                          {formatCurrency(Number(plans.find(p => p.id === selectedPlan)?.price || 0))}
+                        </span>
                       </div>
                     </div>
-                  </>
-                ) : (
-                  <>
-                    <h4 className="text-lg font-black text-white uppercase tracking-widest mb-4 italic">PLANO 100% GRATUITO</h4>
-                    <p className="text-gray-500 font-bold mb-8 text-sm">
-                      Ative agora para começar a explorar os benefícios sem custo inicial.
-                    </p>
-                  </>
-                )}
-              </div>
+                  </div>
 
-              <div className="flex flex-col gap-4">
-                <button
-                  onClick={handlePayment}
-                  disabled={processingPayment}
-                  className="w-full bg-[#FF3131] text-black py-5 rounded-2xl font-black italic uppercase tracking-widest text-base hover:bg-white transition-all transform active:scale-95 shadow-2xl shadow-[#FF3131]/20 flex items-center justify-center space-x-3"
-                >
-                  {processingPayment ? (
-                    <div className="animate-spin rounded-full h-6 w-6 border-2 border-black border-t-transparent"></div>
-                  ) : (
-                    <>
-                      <span>ACESSAR PLATAFORMA</span>
-                      <ArrowRight className="h-5 w-5" />
-                    </>
+                  <div className="text-center mb-10">
+                    <div className="w-20 h-20 bg-[#FF3131]/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                      <Shield className="h-10 w-10 text-[#FF3131]" />
+                    </div>
+                    <h4 className="text-lg font-black text-white uppercase tracking-widest mb-4 italic">PROTEÇÃO DE ATLETA</h4>
+                    <p className="text-gray-500 font-bold text-sm">Escolha sua forma de ativação imediata:</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 mb-10">
+                    <button
+                      onClick={() => setPaymentMethod('pix')}
+                      className={`flex items-center justify-between p-6 rounded-3xl border-2 transition-all ${paymentMethod === 'pix' ? 'border-[#FF3131] bg-[#FF3131]/5' : 'border-white/5 bg-black hover:border-white/10'}`}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-[#FF3131] font-black italic">PX</div>
+                        <div className="text-left">
+                          <p className="text-sm font-black text-white uppercase">PIX INSTANTÂNEO</p>
+                          <p className="text-[10px] font-bold text-gray-600 uppercase">Liberação na hora</p>
+                        </div>
+                      </div>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'pix' ? 'border-[#FF3131]' : 'border-gray-800'}`}>
+                        {paymentMethod === 'pix' && <div className="w-3 h-3 bg-[#FF3131] rounded-full"></div>}
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => setPaymentMethod('credit_card')}
+                      className={`flex items-center justify-between p-6 rounded-3xl border-2 transition-all ${paymentMethod === 'credit_card' ? 'border-blue-500 bg-blue-500/5' : 'border-white/5 bg-black hover:border-white/10'}`}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <CreditCard className="w-10 h-10 text-blue-500" />
+                        <div className="text-left">
+                          <p className="text-sm font-black text-white uppercase">CARTÃO DE CRÉDITO</p>
+                          <p className="text-[10px] font-bold text-gray-600 uppercase">Até 12x s/ juros</p>
+                        </div>
+                      </div>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'credit_card' ? 'border-blue-500' : 'border-gray-800'}`}>
+                        {paymentMethod === 'credit_card' && <div className="w-3 h-3 bg-blue-500 rounded-full"></div>}
+                      </div>
+                    </button>
+                  </div>
+
+                  {paymentMethod === 'credit_card' && (
+                    <div className="space-y-4 mb-10 animate-in slide-in-from-top-4 duration-300">
+                      <div>
+                        <input
+                          type="text"
+                          placeholder="NOME IGUAL NO CARTÃO"
+                          value={cardData.holderName}
+                          onChange={(e) => setCardData({ ...cardData, holderName: e.target.value.toUpperCase() })}
+                          className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xs font-black text-white placeholder:text-gray-700 focus:border-blue-500 outline-none transition-all uppercase tracking-widest"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          placeholder="NÚMERO DO CARTÃO"
+                          value={cardData.number}
+                          onChange={(e) => setCardData({ ...cardData, number: e.target.value.replace(/\D/g, '') })}
+                          className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xs font-black text-white placeholder:text-gray-700 focus:border-blue-500 outline-none transition-all"
+                          maxLength={16}
+                        />
+                      </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        <input
+                          type="text"
+                          placeholder="MÊS (MM)"
+                          value={cardData.expiryMonth}
+                          onChange={(e) => setCardData({ ...cardData, expiryMonth: e.target.value.replace(/\D/g, '') })}
+                          className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xs font-black text-white placeholder:text-gray-700 focus:border-blue-500 outline-none transition-all"
+                          maxLength={2}
+                        />
+                        <input
+                          type="text"
+                          placeholder="ANO (AAAA)"
+                          value={cardData.expiryYear}
+                          onChange={(e) => setCardData({ ...cardData, expiryYear: e.target.value.replace(/\D/g, '') })}
+                          className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xs font-black text-white placeholder:text-gray-700 focus:border-blue-500 outline-none transition-all"
+                          maxLength={4}
+                        />
+                        <input
+                          type="text"
+                          placeholder="CVV"
+                          value={cardData.cvv}
+                          onChange={(e) => setCardData({ ...cardData, cvv: e.target.value.replace(/\D/g, '') })}
+                          className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xs font-black text-white placeholder:text-gray-700 focus:border-blue-500 outline-none transition-all"
+                          maxLength={4}
+                        />
+                      </div>
+                    </div>
                   )}
-                </button>
-                <button
-                  onClick={() => setShowPaymentModal(false)}
-                  className="w-full bg-transparent text-gray-500 py-4 font-black italic uppercase tracking-widest text-xs hover:text-white transition-colors"
-                >
-                  CANCELAR OPERAÇÃO
-                </button>
-              </div>
+
+                  <button
+                    onClick={() => handleSubscription()}
+                    disabled={processingPayment}
+                    className="w-full bg-[#FF3131] text-black py-6 rounded-2xl font-black italic uppercase tracking-widest text-base hover:bg-white transition-all transform active:scale-95 shadow-2xl shadow-[#FF3131]/20 flex items-center justify-center space-x-3"
+                  >
+                    {processingPayment ? (
+                      <div className="animate-spin rounded-full h-6 w-6 border-2 border-black border-t-transparent"></div>
+                    ) : (
+                      <>
+                        <span>CONFIRMAR E GERAR</span>
+                        <ArrowRight className="h-5 w-5" />
+                      </>
+                    )}
+                  </button>
+                </>
+              )}
+
+              {checkoutStep === 'pix' && paymentData?.pix && (
+                <div className="text-center">
+                  <div className="bg-white p-6 rounded-[40px] inline-block mb-8 shadow-2xl">
+                    <img
+                      src={`data:image/png;base64,${paymentData.pix.qrCode}`}
+                      alt="QR Code Pix"
+                      className="w-48 h-48"
+                    />
+                  </div>
+
+                  <div className="mb-8">
+                    <h4 className="text-xl font-black text-white italic uppercase tracking-tighter mb-2">QR CODE GERADO</h4>
+                    <p className="text-gray-500 font-bold text-xs uppercase tracking-widest">Aponte a câmera do seu banco e pague agora</p>
+                  </div>
+
+                  <div className="bg-black border border-white/5 rounded-3xl p-6 mb-10">
+                    <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] mb-3">PIX COPIA E COLA</p>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex-1 overflow-hidden">
+                        <p className="text-white font-mono text-[10px] truncate">{paymentData.pix.copyAndPaste}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(paymentData.pix.copyAndPaste);
+                          toast.success('Código PIX copiado!');
+                        }}
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all"
+                      >
+                        <Download className="h-4 w-4 text-[#FF3131]" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#BFFF00]/10 border border-[#BFFF00]/20 rounded-2xl p-4 mb-10 flex items-center space-x-3">
+                    <div className="animate-pulse">
+                      <RefreshCw className="h-5 w-5 text-[#BFFF00]" />
+                    </div>
+                    <p className="text-[10px] font-black text-[#BFFF00] uppercase tracking-widest text-left leading-tight">
+                      Aguardando confirmação de pagamento...<br />Seu plano será ativado automaticamente.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setShowPaymentModal(false);
+                      setCheckoutStep('options');
+                      setPaymentData(null);
+                      fetchData();
+                    }}
+                    className="w-full bg-white/5 text-white py-5 rounded-2xl font-black italic uppercase tracking-widest text-sm hover:bg-white/10 transition-all"
+                  >
+                    PAGUEI, VOLTAR AO PAINEL
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
