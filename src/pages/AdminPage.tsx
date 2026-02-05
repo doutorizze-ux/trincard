@@ -64,7 +64,7 @@ export default function AdminPage() {
     pendingPartners: partners.filter(p => p.approval_status === 'pending_documentation').length,
     monthlyRevenue: subscriptions
       .filter(s => s.status === 'active')
-      .reduce((sum, s) => sum + (s.plans?.price || 0), 0)
+      .reduce((sum, s) => sum + Number(s.plans?.price || 0), 0)
   }), [users.length, subscriptions, partners])
 
   const shouldRefetch = useCallback(() => {

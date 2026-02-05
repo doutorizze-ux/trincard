@@ -568,7 +568,7 @@ export default function RegisterPage() {
               </div>
               <div className="text-right">
                 <div className={`text-3xl font-black italic tracking-tighter ${formData.selectedPlan === plan.id ? 'text-[#FF3131]' : 'text-white'}`}>
-                  R$ {plan.price.toFixed(2)}
+                  R$ {Number(plan.price).toFixed(2)}
                 </div>
                 <div className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1">por ciclo</div>
               </div>
