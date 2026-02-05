@@ -1,15 +1,15 @@
 import { type Request, type Response } from 'express';
 
 // @ts-ignore
-const ASAAS_API_KEY = process.env.ASAAS_API_KEY;
-const ASAAS_URL = process.env.ASAAS_API_URI || 'https://www.asaas.com/api/v3';
-
 export const createCheckout = async (req: Request, res: Response) => {
     try {
         const { planId, userId, price, title, userEmail, name, cpfCnpj } = req.body;
 
+        const ASAAS_API_KEY = process.env.ASAAS_API_KEY;
+        const ASAAS_URL = process.env.ASAAS_API_URI || process.env.ASAAS_URL || 'https://www.asaas.com/api/v3';
+
         if (!ASAAS_API_KEY) {
-            console.error("ERRO: ASAAS_API_KEY não configurada no servidor.");
+            console.error("ERRO: ASAAS_API_KEY não encontrada nas variáveis de ambiente.");
             return res.status(500).json({ error: "Erro de configuração no servidor de pagamentos." });
         }
 
