@@ -105,19 +105,23 @@ export default function SubscriptionPage() {
   useEffect(() => {
     let interval: any;
     if (showPaymentModal && checkoutStep === 'pix') {
-      interval = setInterval(() => {
-        fetchSubscriptionOnly().then(() => {
-          if (currentSubscription && currentSubscription.status === 'active') {
+      interval = setInterval(async () => {
+        try {
+          const subscriptionData = await api.subscriptions.me();
+          if (subscriptionData && subscriptionData.status === 'active') {
+            setCurrentSubscription(subscriptionData);
             setShowPaymentModal(false);
             setCheckoutStep('options');
             setPaymentData(null);
-            toast.success('Pagamento confirmado! Bem-vindo ao time de elite.');
+            toast.success('PAGAMENTO CONFIRMADO! Bem-vindo à elite.');
           }
-        });
-      }, 5000); // Verifica a cada 5 segundos
+        } catch (e) {
+          console.error('Erro no polling de pagamento:', e);
+        }
+      }, 4000); // Verifica a cada 4 segundos
     }
     return () => clearInterval(interval);
-  }, [showPaymentModal, checkoutStep, currentSubscription]);
+  }, [showPaymentModal, checkoutStep]);
 
   // Handle payment status messages
   useEffect(() => {
