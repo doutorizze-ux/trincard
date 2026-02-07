@@ -5,6 +5,63 @@ export const initDb = async () => {
     try {
         console.log('Verificando integridade do banco de dados...');
 
+        // Tabela de Parceiros
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS public.partners (
+              id uuid NOT NULL DEFAULT gen_random_uuid(),
+              company_name character varying NOT NULL,
+              category character varying DEFAULT 'geral'::character varying,
+              address jsonb,
+              contact_info jsonb,
+              approval_status character varying DEFAULT 'pending_documentation'::character varying CHECK (approval_status::text = ANY (ARRAY['approved'::character varying, 'pending_documentation'::character varying, 'rejected'::character varying]::text[])),
+              approval_date timestamp with time zone,
+              percentage numeric CHECK (percentage >= 0::numeric AND percentage <= 100::numeric),
+              contract_url text,
+              document_status character varying DEFAULT 'missing'::character varying CHECK (document_status::text = ANY (ARRAY['missing'::character varying, 'uploaded'::character varying, 'verified'::character varying]::text[])),
+              contact_email character varying,
+              contact_phone character varying,
+              notes text,
+              created_by uuid,
+              created_at timestamp with time zone DEFAULT now(),
+              updated_at timestamp with time zone DEFAULT now(),
+              CONSTRAINT partners_pkey PRIMARY KEY (id),
+              CONSTRAINT partners_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id)
+            );
+        `);
+
+        // Tabela de Planos
+        await pool.query(`
+           CREATE TABLE IF NOT EXISTS public.plans (
+              id uuid NOT NULL DEFAULT gen_random_uuid(),
+              name character varying NOT NULL,
+              price numeric NOT NULL,
+              description text,
+              features jsonb,
+              is_active boolean DEFAULT true,
+              created_at timestamp with time zone DEFAULT now(),
+              CONSTRAINT plans_pkey PRIMARY KEY (id)
+            );
+        `);
+
+        // Tabela de Assinaturas
+        await pool.query(`
+           CREATE TABLE IF NOT EXISTS public.subscriptions (
+              id uuid NOT NULL DEFAULT gen_random_uuid(),
+              user_id uuid,
+              plan_id uuid,
+              status character varying DEFAULT 'active'::character varying CHECK (status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'suspended'::character varying, 'cancelled'::character varying]::text[])),
+              barcode character varying NOT NULL UNIQUE,
+              due_date timestamp with time zone NOT NULL,
+              start_date timestamp with time zone DEFAULT now(),
+              end_date timestamp with time zone,
+              created_at timestamp with time zone DEFAULT now(),
+              updated_at timestamp with time zone DEFAULT now(),
+              CONSTRAINT subscriptions_pkey PRIMARY KEY (id),
+              CONSTRAINT subscriptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+              CONSTRAINT subscriptions_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.plans(id)
+            );
+        `);
+
         // Tabela de Benefícios
         await pool.query(`
             CREATE TABLE IF NOT EXISTS public.benefits (
