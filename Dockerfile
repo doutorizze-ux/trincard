@@ -25,6 +25,11 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/api ./api
 COPY --from=builder /app/database ./database
 
+RUN mkdir -p uploads
+
+# Persistência de uploads
+VOLUME ["/app/uploads"]
+
 # Variáveis de ambiente padrão
 ENV PORT=3000
 ENV NODE_ENV=production
