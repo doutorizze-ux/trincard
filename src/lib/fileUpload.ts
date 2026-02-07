@@ -43,8 +43,8 @@ export async function uploadFile(
     }
     // Nota: NÃO setar 'Content-Type': 'multipart/form-data', o browser faz isso com o boundary correto.
 
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
-    const response = await fetch(`${apiUrl}/upload`, {
+    const apiUrl = import.meta.env.VITE_API_URL || '';
+    const response = await fetch(`${apiUrl}/api/upload`, {
       method: 'POST',
       headers,
       body: formData
@@ -64,9 +64,18 @@ export async function uploadFile(
 
   } catch (error: any) {
     console.error('Erro inesperado no upload:', error);
+
+    let errorMessage = error.message || 'Erro inesperado durante o upload.';
+
+    if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+      errorMessage = 'Não foi possível conectar ao servidor. Verifique se o backend está rodando.';
+    } else if (errorMessage.includes('API not found') || errorMessage.includes('404')) {
+      errorMessage = 'Endpoint de upload não encontrado (404). Verifique a URL da API.';
+    }
+
     return {
       success: false,
-      error: error.message || 'Erro inesperado durante o upload.'
+      error: errorMessage
     };
   }
 }
