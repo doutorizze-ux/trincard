@@ -28,9 +28,12 @@ export const updateUser = async (req: Request, res: Response) => {
         }
 
         res.json(result.rows[0]);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Erro ao atualizar usuário:', error);
-        res.status(500).json({ error: 'Erro ao atualizar usuário' });
+        res.status(500).json({
+            error: 'Erro ao atualizar usuário',
+            details: error.message || String(error)
+        });
     }
 };
 
@@ -48,16 +51,30 @@ export const deleteUser = async (req: Request, res: Response) => {
         // Por segurança, vamos apenas desativar em vez de deletar fisicamente se houver vínculos, 
         // ou deletar em cascata se o banco permitir.
 
-        // Vamos deletar assinaturas vinculadas primeiro para evitar erro de FK
-        await pool.query('DELETE FROM subscriptions WHERE user_id = $1', [id]);
-        await pool.query('DELETE FROM benefit_usage WHERE user_id = $1', [id]);
+        // Ordem de deleção importa devido às foreign keys
+        // 1. Deletar pagamentos (que podem depender de assinaturas e usuários)
         await pool.query('DELETE FROM payments WHERE user_id = $1', [id]);
 
+        // 2. Deletar assinaturas (que dependem de usuários) - se pagamentos dependem de assinaturas, eles já foram
+        await pool.query('DELETE FROM subscriptions WHERE user_id = $1', [id]);
+
+        // 3. Deletar uso de benefícios
+        await pool.query('DELETE FROM benefit_usage WHERE user_id = $1', [id]);
+
+        // 4. Finalmente, deletar o usuário
         const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id', [id]);
 
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Usuário não encontrado ou já deletado' });
+        }
+
         res.json({ success: true, message: 'Usuário deletado com sucesso' });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Erro ao deletar usuário:', error);
-        res.status(500).json({ error: 'Erro ao deletar usuário' });
+        // Retornar mensagem detalhada para debug
+        res.status(500).json({
+            error: 'Erro ao deletar usuário',
+            details: error.message || String(error)
+        });
     }
 };
