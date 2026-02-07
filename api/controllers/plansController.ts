@@ -39,24 +39,45 @@ export const createPlan = async (req: Request, res: Response) => {
 export const updatePlan = async (req: Request, res: Response) => {
     const { name, price, description, features, is_active } = req.body;
     try {
+        const featuresJson = typeof features === 'string' ? features : JSON.stringify(features);
+
         const result = await pool.query(
-            `UPDATE plans SET name = $1, price = $2, description = $3, features = $4, is_active = $5 
+            `UPDATE plans SET name = COALESCE($1, name), price = COALESCE($2, price), description = COALESCE($3, description), features = COALESCE($4, features), is_active = COALESCE($5, is_active) 
        WHERE id = $6 RETURNING *`,
-            [name, price, description, JSON.stringify(features), is_active, req.params.id]
+            [name, price, description, featuresJson, is_active, req.params.id]
         );
         if (result.rows.length === 0) return res.status(404).json({ error: 'Plano não encontrado' });
         res.json(result.rows[0]);
-    } catch (error) {
-        res.status(500).json({ error: 'Erro ao atualizar plano' });
+    } catch (error: any) {
+        console.error('Erro ao atualizar plano:', error);
+        res.status(500).json({
+            error: 'Erro ao atualizar plano',
+            details: error.message || String(error)
+        });
     }
 };
 
 export const deletePlan = async (req: Request, res: Response) => {
     try {
+        // Verificar dependências antes de deletar
+        // Se houver assinaturas vinculadas a este plano, não podemos deletar diretamente
+        // O ideal é arquivar (is_active = false)
+
+        const subscriptionsCheck = await pool.query('SELECT count(*) FROM subscriptions WHERE plan_id = $1', [req.params.id]);
+        if (parseInt(subscriptionsCheck.rows[0].count) > 0) {
+            console.log(`Plano ${req.params.id} tem assinaturas ativas. Arquivando em vez de deletar.`);
+            const result = await pool.query('UPDATE plans SET is_active = false WHERE id = $1 RETURNING *', [req.params.id]);
+            return res.json({ success: true, message: 'Plano arquivado pois possui assinaturas vinculadas', plan: result.rows[0] });
+        }
+
         const result = await pool.query('DELETE FROM plans WHERE id = $1 RETURNING id', [req.params.id]);
         if (result.rows.length === 0) return res.status(404).json({ error: 'Plano não encontrado' });
         res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: 'Erro ao deletar plano' });
+    } catch (error: any) {
+        console.error('Erro ao deletar plano:', error);
+        res.status(500).json({
+            error: 'Erro ao deletar plano',
+            details: error.message || String(error)
+        });
     }
 };
