@@ -26,7 +26,7 @@ export const register = async (req: Request, res: Response) => {
         const newUser = await pool.query(
             `INSERT INTO users (email, password_hash, full_name, cpf, phone, address, card_type) 
              VALUES ($1, $2, $3, $4, $5, $6, $7) 
-             RETURNING id, email, full_name, role`,
+             RETURNING id, email, full_name, role, cpf, phone, address, card_type, created_at`,
             [email, passwordHash, full_name, cpf, phone, address, card_type]
         );
 

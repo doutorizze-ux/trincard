@@ -23,14 +23,30 @@ export const createCheckout = async (req: Request, res: Response) => {
         };
 
         // 1. Buscar ou Criar Cliente no Asaas
+        if (!cpfCnpj) {
+            return res.status(400).json({ error: "CPF/CNPJ é obrigatório para processar o pagamento." });
+        }
+
+        const cleanCpf = cpfCnpj.replace(/\D/g, '');
+
+        // 1. Buscar ou Criar Cliente no Asaas
         let customerId = '';
         const customerSearch = await fetch(`${ASAAS_URL}/customers?email=${userEmail}`, { headers });
         const customerData: any = await customerSearch.json();
 
         if (customerData.data && customerData.data.length > 0) {
             customerId = customerData.data[0].id;
+
+            // Verifica se o cliente existente já tem CPF, se não, atualiza
+            if (!customerData.data[0].cpfCnpj && cleanCpf) {
+                console.log(`Atualizando CPF do cliente ${customerId}...`);
+                await fetch(`${ASAAS_URL}/customers/${customerId}`, {
+                    method: 'POST', // Asaas usa POST para update em alguns endpoints, mas doc diz PUT ou POST
+                    headers,
+                    body: JSON.stringify({ cpfCnpj: cleanCpf })
+                });
+            }
         } else {
-            const cleanCpf = cpfCnpj ? cpfCnpj.replace(/\D/g, '') : '';
             const newCustomerRes = await fetch(`${ASAAS_URL}/customers`, {
                 method: 'POST',
                 headers,
