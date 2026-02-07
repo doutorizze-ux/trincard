@@ -21,6 +21,18 @@ export default function DigitalCard({
     isPublic = false
 }: DigitalCardProps) {
     const isActive = status === 'active';
+    const isPending = status === 'pending';
+
+    let statusText = 'Inativo';
+    let statusColor = 'text-red-400';
+
+    if (isActive) {
+        statusText = 'Ativo';
+        statusColor = 'text-lime-400';
+    } else if (isPending) {
+        statusText = 'Pendente';
+        statusColor = 'text-yellow-400';
+    }
 
     return (
         <div className="relative w-full max-w-[500px] aspect-[1.6/1] rounded-[30px] overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] duration-500 font-outfit">
@@ -97,8 +109,8 @@ export default function DigitalCard({
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-[0.5rem] md:text-[0.6rem] font-black uppercase tracking-widest opacity-60">Status</span>
-                                <span className={`text-[0.7rem] md:text-sm font-black uppercase tracking-widest ${isActive ? 'text-lime-400' : 'text-red-400'}`}>
-                                    {isActive ? 'Ativo' : 'Inativo'}
+                                <span className={`text-[0.7rem] md:text-sm font-black uppercase tracking-widest ${statusColor}`}>
+                                    {statusText}
                                 </span>
                             </div>
                         </div>

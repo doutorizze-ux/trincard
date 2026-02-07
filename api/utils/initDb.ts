@@ -2,11 +2,11 @@
 import pool from '../config/db.js';
 
 export const initDb = async () => {
-    try {
-        console.log('Verificando integridade do banco de dados...');
+  try {
+    console.log('Verificando integridade do banco de dados...');
 
-        // Tabela de Parceiros
-        await pool.query(`
+    // Tabela de Parceiros
+    await pool.query(`
             CREATE TABLE IF NOT EXISTS public.partners (
               id uuid NOT NULL DEFAULT gen_random_uuid(),
               company_name character varying NOT NULL,
@@ -29,8 +29,8 @@ export const initDb = async () => {
             );
         `);
 
-        // Tabela de Planos
-        await pool.query(`
+    // Tabela de Planos
+    await pool.query(`
            CREATE TABLE IF NOT EXISTS public.plans (
               id uuid NOT NULL DEFAULT gen_random_uuid(),
               name character varying NOT NULL,
@@ -43,13 +43,14 @@ export const initDb = async () => {
             );
         `);
 
-        // Tabela de Assinaturas
-        await pool.query(`
+    // Tabela de Assinaturas
+    await pool.query(`
            CREATE TABLE IF NOT EXISTS public.subscriptions (
               id uuid NOT NULL DEFAULT gen_random_uuid(),
               user_id uuid,
               plan_id uuid,
-              status character varying DEFAULT 'active'::character varying CHECK (status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'suspended'::character varying, 'cancelled'::character varying]::text[])),
+              gateway_id text,
+              status character varying DEFAULT 'active'::character varying CHECK (status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'suspended'::character varying, 'cancelled'::character varying, 'pending'::character varying]::text[])),
               barcode character varying NOT NULL UNIQUE,
               due_date timestamp with time zone NOT NULL,
               start_date timestamp with time zone DEFAULT now(),
@@ -62,8 +63,32 @@ export const initDb = async () => {
             );
         `);
 
-        // Tabela de Benefícios
-        await pool.query(`
+    // Migração de Resiliência (Rodar sempre que possível para garantir updates em bancos já existentes)
+    try {
+      await pool.query(`ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS gateway_id text;`);
+
+      // Tenta atualizar a constraint de status (DROP IF EXISTS não é padrão em todas versões, então vamos tentar o alter direto)
+      // Postgres requer deletar e recriar para mudar valores do CHECK
+      await pool.query(`
+                DO $$
+                BEGIN
+                    IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'subscriptions_status_check') THEN
+                        ALTER TABLE subscriptions DROP CONSTRAINT subscriptions_status_check;
+                    END IF;
+                END $$;
+             `);
+
+      await pool.query(`
+                ALTER TABLE subscriptions 
+                ADD CONSTRAINT subscriptions_status_check 
+                CHECK (status IN ('active', 'inactive', 'suspended', 'cancelled', 'pending'));
+             `);
+    } catch (migError) {
+      console.log('Migração de schema (subscriptions) já aplicada ou não necessária:', migError);
+    }
+
+    // Tabela de Benefícios
+    await pool.query(`
             CREATE TABLE IF NOT EXISTS public.benefits (
               id uuid NOT NULL DEFAULT gen_random_uuid(),
               partner_id uuid,
@@ -78,8 +103,8 @@ export const initDb = async () => {
             );
         `);
 
-        // Tabela de Uso de Benefícios
-        await pool.query(`
+    // Tabela de Uso de Benefícios
+    await pool.query(`
             CREATE TABLE IF NOT EXISTS public.benefit_usage (
               id uuid NOT NULL DEFAULT gen_random_uuid(),
               user_id uuid,
@@ -93,8 +118,8 @@ export const initDb = async () => {
             );
         `);
 
-        // Criar tabela payments se não existir
-        await pool.query(`
+    // Criar tabela payments se não existir
+    await pool.query(`
             CREATE TABLE IF NOT EXISTS public.payments (
               id uuid NOT NULL DEFAULT gen_random_uuid(),
               subscription_id uuid,
@@ -112,18 +137,18 @@ export const initDb = async () => {
             );
         `);
 
-        // Garantir indices (opcional, mas bom pra performance)
-        await pool.query(`
+    // Garantir indices (opcional, mas bom pra performance)
+    await pool.query(`
             CREATE INDEX IF NOT EXISTS idx_payments_user_id ON public.payments(user_id);
             CREATE INDEX IF NOT EXISTS idx_payments_subscription_id ON public.payments(subscription_id);
             CREATE INDEX IF NOT EXISTS idx_benefit_usage_user_id ON public.benefit_usage(user_id);
             CREATE INDEX IF NOT EXISTS idx_benefit_usage_benefit_id ON public.benefit_usage(benefit_id);
         `);
 
-        console.log('Banco de dados verificado. Tabelas garantidas.');
-    } catch (error) {
-        console.error('Erro ao inicializar banco de dados:', error);
-        // Não matar o processo, pois pode ser erro de permissão ou conexão momentânea,
-        // e o app pode funcionar parcialmente.
-    }
+    console.log('Banco de dados verificado. Tabelas garantidas.');
+  } catch (error) {
+    console.error('Erro ao inicializar banco de dados:', error);
+    // Não matar o processo, pois pode ser erro de permissão ou conexão momentânea,
+    // e o app pode funcionar parcialmente.
+  }
 };

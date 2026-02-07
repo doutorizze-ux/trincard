@@ -19,20 +19,72 @@ export const getAllSubscriptions = async (req: Request, res: Response) => {
 export const getUserSubscription = async (req: Request, res: Response) => {
     try {
         const userId = (req as any).user.id;
+
+        // Buscar assinatura ativa ou pendente (prioriza ativa se houver múltiplas, pelo order by status/created_at)
+        // Mas a lógica abaixo pega a mais recente.
         const result = await pool.query(`
             SELECT s.*, p.name as plan_name, p.price as plan_price, p.features as plan_features,
             json_build_object('name', p.name, 'price', p.price, 'features', p.features) as plans
             FROM subscriptions s
             JOIN plans p ON s.plan_id = p.id
-            WHERE s.user_id = $1 AND s.status = 'active'
-            ORDER BY s.created_at DESC
+            WHERE s.user_id = $1 AND (s.status = 'active' OR s.status = 'pending')
+            ORDER BY 
+                CASE WHEN s.status = 'active' THEN 1 ELSE 2 END,
+                s.created_at DESC
             LIMIT 1
         `, [userId]);
 
         if (result.rows.length === 0) {
             return res.json(null);
         }
-        res.json(result.rows[0]);
+
+        const subscription = result.rows[0];
+
+        // Se for pendente e tiver gateway_id, verifica no Asaas se já pagou
+        if (subscription.status === 'pending' && subscription.gateway_id) {
+            console.log(`Verificando status da assinatura ${subscription.gateway_id} no Asaas...`);
+            const ASAAS_API_KEY = process.env.ASAAS_API_KEY;
+            const ASAAS_URL = process.env.ASAAS_API_URI || process.env.ASAAS_URL || 'https://www.asaas.com/api/v3';
+
+            if (ASAAS_API_KEY) {
+                try {
+                    const asaasRes = await fetch(`${ASAAS_URL}/subscriptions/${subscription.gateway_id}`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'access_token': ASAAS_API_KEY
+                        }
+                    });
+                    const asaasData: any = await asaasRes.json();
+
+                    if (asaasData.status === 'ACTIVE') {
+                        console.log('Assinatura ativada no Asaas! Atualizando localmente...');
+
+                        // Atualizar para ativo e gerar código de barras real se ainda for temporário
+                        // Mas o webhook geraria um novo. Aqui vamos apenas ativar este registro.
+                        // O ideal seria alinhar 100% com o webhook, mas isso resolve o bloqueio do usuário.
+
+                        const barcode = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+
+                        const updateRes = await pool.query(`
+                            UPDATE subscriptions 
+                            SET status = 'active', 
+                                barcode = $1, 
+                                updated_at = NOW() 
+                            WHERE id = $2 
+                            RETURNING *
+                        `, [barcode, subscription.id]);
+
+                        // Atualizar objeto para retorno
+                        subscription.status = 'active';
+                        subscription.barcode = barcode;
+                    }
+                } catch (checkErr) {
+                    console.error('Erro ao checar status no Asaas:', checkErr);
+                }
+            }
+        }
+
+        res.json(subscription);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao buscar assinatura do usuário' });

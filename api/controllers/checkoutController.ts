@@ -1,6 +1,8 @@
 import { type Request, type Response } from 'express';
 
 // @ts-ignore
+import pool from '../config/db.js';
+
 export const createCheckout = async (req: Request, res: Response) => {
     try {
         const { planId, userId, price, title, userEmail, name, cpfCnpj } = req.body;
@@ -111,6 +113,29 @@ export const createCheckout = async (req: Request, res: Response) => {
         if (subData.errors) {
             console.error('Erro Asaas create subscription:', subData.errors);
             return res.status(400).json({ error: `Erro ao criar assinatura: ${subData.errors[0].description}` });
+        }
+
+        // SALVAR ASSINATURA PENDENTE NO BANCO
+        // Isso garante que temos um registro local mesmo se o webhook falhar
+        try {
+            // Gerar código de barras temporário
+            const tempBarcode = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+
+            await pool.query(`
+                INSERT INTO subscriptions (
+                    user_id, plan_id, gateway_id, status, barcode, due_date, start_date, end_date, created_at, updated_at
+                ) VALUES ($1, $2, $3, 'pending', $4, $5, NOW(), NOW(), NOW(), NOW())
+            `, [
+                userId,
+                planId,
+                subData.id,
+                tempBarcode,
+                subData.nextDueDate
+            ]);
+            console.log(`Assinatura pendente criada localmente para user ${userId} com gateway_id ${subData.id}`);
+        } catch (dbError) {
+            console.error('Erro ao salvar assinatura pendente no banco:', dbError);
+            // Não falhar o request por isso, mas logar o erro
         }
 
         // 3. Buscar o Link de Pagamento e dados de PIX
