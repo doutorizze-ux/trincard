@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
+import { useAuth } from '../context/AuthContext';
 import {
   CreditCard,
   Zap,
@@ -18,6 +19,7 @@ import {
 import { api } from '../lib/api';
 
 export default function HomePage() {
+  const { user } = useAuth();
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,6 +36,14 @@ export default function HomePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getDestination = () => {
+    return user ? '/dashboard' : '/cadastro';
+  };
+
+  const getButtonText = () => {
+    return user ? 'MEU PAINEL' : 'ADQUIRIR AGORA';
   };
 
   const features = [
@@ -98,10 +108,10 @@ export default function HomePage() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
-                  to="/cadastro"
+                  to={getDestination()}
                   className="bg-[#FF3131] text-black px-10 py-5 rounded-2xl text-xl font-black italic uppercase tracking-wider hover:bg-white transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(255,49,49,0.4)] flex items-center justify-center space-x-3"
                 >
-                  <span>ADQUIRIR AGORA</span>
+                  <span>{getButtonText()}</span>
                   <ArrowRight className="h-6 w-6" />
                 </Link>
                 <Link
@@ -232,13 +242,13 @@ export default function HomePage() {
                     </div>
 
                     <Link
-                      to="/cadastro"
+                      to={getDestination()}
                       className={`w-full py-6 rounded-2xl font-black italic uppercase tracking-widest transition-all flex items-center justify-center space-x-2 ${plan.features?.exclusive_benefits
                         ? 'bg-[#FF3131] text-black hover:bg-white shadow-[0_0_20px_rgba(255,49,49,0.2)]'
                         : 'bg-white/5 text-white hover:bg-white hover:text-black border border-white/10'
                         }`}
                     >
-                      <span>ATIVAR AGORA</span>
+                      <span>{user ? 'ATIVAR AGORA' : 'QUERO ESTE'}</span>
                       <ArrowRight className="h-5 w-5" />
                     </Link>
                   </div>
@@ -264,7 +274,7 @@ export default function HomePage() {
             Não perca mais tempo. Junte-se aos milhares de clientes que já estão economizando e desfrutando de benefícios exclusivos.
           </p>
           <Link
-            to="/cadastro"
+            to={getDestination()}
             className="group bg-[#FF3131] text-black px-16 py-8 rounded-[30px] text-2xl font-black italic uppercase tracking-wider hover:bg-white transition-all transform hover:scale-105 active:scale-95 shadow-2xl inline-flex items-center space-x-4"
           >
             <span>ENTRAR PARA O CLUBE</span>

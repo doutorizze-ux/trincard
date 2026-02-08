@@ -41,48 +41,14 @@ export const getUserSubscription = async (req: Request, res: Response) => {
         const subscription = result.rows[0];
 
         // Se for pendente e tiver gateway_id, verifica no Asaas se já pagou
+        // ATENÇÃO: A assinatura no Asaas nasce como 'ACTIVE'. Isso não significa 'PAGA'.
+        // Devemos esperar o Webhook 'PAYMENT_CONFIRMED' para ativar o acesso.
+        // Removida a auto-ativação baseada apenas no status da assinatura para evitar falsos positivos.
+        /* 
         if (subscription.status === 'pending' && subscription.gateway_id) {
-            console.log(`Verificando status da assinatura ${subscription.gateway_id} no Asaas...`);
-            const ASAAS_API_KEY = process.env.ASAAS_API_KEY;
-            const ASAAS_URL = process.env.ASAAS_API_URI || process.env.ASAAS_URL || 'https://www.asaas.com/api/v3';
-
-            if (ASAAS_API_KEY) {
-                try {
-                    const asaasRes = await fetch(`${ASAAS_URL}/subscriptions/${subscription.gateway_id}`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'access_token': ASAAS_API_KEY
-                        }
-                    });
-                    const asaasData: any = await asaasRes.json();
-
-                    if (asaasData.status === 'ACTIVE') {
-                        console.log('Assinatura ativada no Asaas! Atualizando localmente...');
-
-                        // Atualizar para ativo e gerar código de barras real se ainda for temporário
-                        // Mas o webhook geraria um novo. Aqui vamos apenas ativar este registro.
-                        // O ideal seria alinhar 100% com o webhook, mas isso resolve o bloqueio do usuário.
-
-                        const barcode = Math.floor(100000000000 + Math.random() * 900000000000).toString();
-
-                        const updateRes = await pool.query(`
-                            UPDATE subscriptions 
-                            SET status = 'active', 
-                                barcode = $1, 
-                                updated_at = NOW() 
-                            WHERE id = $2 
-                            RETURNING *
-                        `, [barcode, subscription.id]);
-
-                        // Atualizar objeto para retorno
-                        subscription.status = 'active';
-                        subscription.barcode = barcode;
-                    }
-                } catch (checkErr) {
-                    console.error('Erro ao checar status no Asaas:', checkErr);
-                }
-            }
+           ... (código removido para segurança) ...
         }
+        */
 
         res.json(subscription);
     } catch (error) {
