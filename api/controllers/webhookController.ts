@@ -86,7 +86,7 @@ export const handleAsaasWebhook = async (req: Request, res: Response) => {
                     RETURNING id
                 `;
                 const subResult = await client.query(insertSubQuery, [
-                    actualUserId, actualPlanId, barcode, endDateIso, startDateIso, endDateIso
+                    actualUserId, actualPlanId, barcode, dueDateIso, startDateIso, endDateIso
                 ]);
 
                 // 7. Registrar o pagamento
