@@ -322,7 +322,7 @@ export default function SubscriptionPage() {
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">RENOVA EM</p>
-                    <p className="text-2xl font-black text-white italic tracking-tighter uppercase">{formatDate(currentSubscription.start_date)}</p>
+                    <p className="text-2xl font-black text-white italic tracking-tighter uppercase">{formatDate(currentSubscription.due_date)}</p>
                   </div>
                 </div>
 
