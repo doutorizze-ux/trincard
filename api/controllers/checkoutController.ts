@@ -99,7 +99,7 @@ export const createCheckout = async (req: Request, res: Response) => {
                 name: cardData.holderName,
                 email: userEmail,
                 cpfCnpj: cpfCnpj ? cpfCnpj.replace(/\D/g, '') : '',
-                postalCode: '75380000', // Padrão se não houver
+                postalCode: '01310100', // Av. Paulista, SP - CEP válido para testes
                 addressNumber: '100',
                 addressComplement: 'Assinatura App',
                 phone: '62999999999'
