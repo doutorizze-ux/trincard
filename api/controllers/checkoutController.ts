@@ -10,6 +10,10 @@ export const createCheckout = async (req: Request, res: Response) => {
         const ASAAS_API_KEY = process.env.ASAAS_API_KEY;
         const ASAAS_URL = process.env.ASAAS_API_URI || process.env.ASAAS_URL || 'https://www.asaas.com/api/v3';
 
+        // Determinar ambiente para log
+        const isSandbox = ASAAS_URL.includes('sandbox');
+        console.log(`[Checkout] Iniciando transação no ambiente: ${isSandbox ? 'SANDBOX (Teste)' : 'PRODUÇÃO'}`);
+
         // Debug: Listar chaves ASAAS disponíveis
         const availableKeys = Object.keys(process.env).filter(k => k.startsWith('ASAAS'));
         console.log('Chaves ASAAS detectadas no ambiente:', availableKeys);
