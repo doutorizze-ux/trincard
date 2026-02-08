@@ -88,12 +88,13 @@ export const createCheckout = async (req: Request, res: Response) => {
 
         // Se for cartão, adicionamos os detalhes técnicos
         if (billingType === 'CREDIT_CARD' && cardData) {
-            // Buscar dados de endereço do usuário no banco
-            const userAddressResult = await pool.query(
-                'SELECT postal_code, address, address_number, city, state, phone FROM users WHERE id = $1',
+            // Buscar dados de endereço do usuário no banco (address é JSONB)
+            const userDataResult = await pool.query(
+                'SELECT address, phone FROM users WHERE id = $1',
                 [userId]
             );
-            const userAddress = userAddressResult.rows[0] || {};
+            const userData = userDataResult.rows[0] || {};
+            const userAddress = userData.address || {};
 
             subscriptionPayload.creditCard = {
                 holderName: cardData.holderName,
@@ -106,10 +107,10 @@ export const createCheckout = async (req: Request, res: Response) => {
                 name: cardData.holderName,
                 email: userEmail,
                 cpfCnpj: cpfCnpj ? cpfCnpj.replace(/\D/g, '') : '',
-                postalCode: userAddress.postal_code || '01310100', // Usa CEP do usuário ou fallback
-                addressNumber: userAddress.address_number || '100',
+                postalCode: userAddress.postalCode || userAddress.postal_code || '01310100', // Usa CEP do usuário ou fallback
+                addressNumber: userAddress.number || '100',
                 addressComplement: 'Assinatura Trincard',
-                phone: userAddress.phone || '62999999999'
+                phone: userData.phone || '62999999999'
             };
         }
 
