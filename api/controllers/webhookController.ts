@@ -60,12 +60,19 @@ export const handleAsaasWebhook = async (req: Request, res: Response) => {
                 );
 
                 // 4. Calcular datas com precisão
-                const startDate = new Date();
-                const endDate = new Date();
-                endDate.setDate(startDate.getDate() + durationDays);
+                const startDate = new Date(); // Data atual
+                const endDate = new Date(startDate); // Clona data atual
+                endDate.setDate(startDate.getDate() + durationDays); // Soma dias
+
+                console.log(`[Webhook] Calculando datas: Inicio=${startDate.toISOString()}, Dias=${durationDays}, Fim=${endDate.toISOString()}`);
 
                 const startDateIso = startDate.toISOString();
                 const endDateIso = endDate.toISOString();
+                // O vencimento da próxima fatura pode ser definido como o fim do período
+                const dueDateIso = endDateIso;
+
+                // Ou podemos usar a data original que veio do Asaas payment.dueDate, se preferir
+                // const dueDateIso = payment.dueDate ? new Date(payment.dueDate).toISOString() : endDateIso;
 
                 // 5. Gerar código de barras único
                 const barcode = Math.floor(100000000000 + Math.random() * 900000000000).toString();

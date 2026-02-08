@@ -8,7 +8,7 @@ export const createCheckout = async (req: Request, res: Response) => {
         const { planId, userId, price, title, userEmail, name, cpfCnpj } = req.body;
 
         const ASAAS_API_KEY = process.env.ASAAS_API_KEY;
-        const ASAAS_URL = process.env.ASAAS_API_URI || process.env.ASAAS_URL || 'https://www.asaas.com/api/v3';
+        const ASAAS_URL = process.env.ASAAS_URL || process.env.ASAAS_API_URI || 'https://www.asaas.com/api/v3';
 
         // Determinar ambiente para log
         const isSandbox = ASAAS_URL.includes('sandbox');
