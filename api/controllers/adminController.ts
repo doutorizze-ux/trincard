@@ -82,3 +82,40 @@ export const getFinancialSummary = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Erro ao buscar resumo financeiro' });
     }
 };
+export const deletePayment = async (req: Request, res: Response) => {
+    try {
+        const user = (req as any).user;
+        if (!user || user.role !== 'admin' && !user.is_admin) {
+            return res.status(403).json({ error: 'Acesso negado' });
+        }
+
+        const { id } = req.params;
+        await pool.query('DELETE FROM payments WHERE id = $1', [id]);
+        res.json({ success: true, message: 'Pagamento excluído com sucesso' });
+    } catch (error) {
+        console.error('Error deleting payment:', error);
+        res.status(500).json({ error: 'Erro ao excluir pagamento' });
+    }
+};
+
+export const deleteSubscription = async (req: Request, res: Response) => {
+    try {
+        const user = (req as any).user;
+        if (!user || user.role !== 'admin' && !user.is_admin) {
+            return res.status(403).json({ error: 'Acesso negado' });
+        }
+
+        const { id } = req.params;
+
+        // Primeiro precisamos apagar pagamentos vinculados a esta assinatura (ou setar NULL)
+        // Por segurança do histórico financeiro, vamos apagar apenas se solicitado ou garantir a integridade.
+        // Aqui vamos apagar os pagamentos vinculados para permitir a exclusão da assinatura.
+        await pool.query('DELETE FROM payments WHERE subscription_id = $1', [id]);
+        await pool.query('DELETE FROM subscriptions WHERE id = $1', [id]);
+
+        res.json({ success: true, message: 'Assinatura e pagamentos vinculados excluídos' });
+    } catch (error) {
+        console.error('Error deleting subscription:', error);
+        res.status(500).json({ error: 'Erro ao excluir assinatura' });
+    }
+};

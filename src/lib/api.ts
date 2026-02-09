@@ -63,6 +63,8 @@ export const api = {
     },
     admin: {
         financialSummary: () => request('/admin/financial-summary'),
+        deletePayment: (id: string) => request(`/admin/payments/${id}`, { method: 'DELETE' }),
+        deleteSubscription: (id: string) => request(`/admin/subscriptions/${id}`, { method: 'DELETE' }),
     },
     // Helper para formatar URLs de imagens/arquivos vindos do servidor
     getFileUrl: (path: string) => {

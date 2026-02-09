@@ -171,6 +171,34 @@ export default function AdminPage() {
     fetchData();
   };
 
+  const handleDeleteSubscription = async (id: string, userName: string) => {
+    if (!confirm(`Tem certeza que deseja excluir a assinatura de ${userName}? Isso também removerá todos os pagamentos vinculados a ela.`)) {
+      return;
+    }
+
+    try {
+      await (api as any).admin.deleteSubscription(id);
+      toast.success('Assinatura removida com sucesso');
+      fetchData();
+    } catch (error: any) {
+      toast.error('Erro ao remover assinatura');
+    }
+  };
+
+  const handleDeletePayment = async (id: string, amount: number) => {
+    if (!confirm(`Deseja excluir este registro de pagamento de ${formatCurrency(amount)}?`)) {
+      return;
+    }
+
+    try {
+      await (api as any).admin.deletePayment(id);
+      toast.success('Pagamento removido com sucesso');
+      fetchData();
+    } catch (error: any) {
+      toast.error('Erro ao remover pagamento');
+    }
+  };
+
   const handleEditPartner = (partner: Partner) => {
     console.log('Editing partner:', partner);
     setEditingPartner(partner);
@@ -800,6 +828,13 @@ export default function AdminPage() {
                               <button className="text-green-600 hover:text-green-700">
                                 <Edit className="h-4 w-4" />
                               </button>
+                              <button
+                                onClick={() => handleDeleteSubscription(subscription.id, subscription.users?.full_name || 'Usuário')}
+                                className="text-red-500 hover:text-red-700"
+                                title="Excluir assinatura permanentemente"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -951,6 +986,7 @@ export default function AdminPage() {
                             <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Plano</th>
                             <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Valor</th>
                             <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Ações</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -973,6 +1009,15 @@ export default function AdminPage() {
                                   }`}>
                                   {tx.status === 'completed' ? 'CONCLUÍDO' : 'PENDENTE'}
                                 </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button
+                                  onClick={() => handleDeletePayment(tx.id, tx.amount)}
+                                  className="text-red-500 hover:text-red-700"
+                                  title="Excluir lançamento"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
                               </td>
                             </tr>
                           ))}
