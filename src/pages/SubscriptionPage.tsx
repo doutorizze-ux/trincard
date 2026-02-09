@@ -48,6 +48,9 @@ export default function SubscriptionPage() {
     cvv: ''
   });
   const [searchParams] = useSearchParams();
+  const [payments, setPayments] = useState<any[]>([]);
+  const [showInvoicesModal, setShowInvoicesModal] = useState(false);
+  const [loadingInvoices, setLoadingInvoices] = useState(false);
 
   const fetchPlansOnly = async () => {
     try {
@@ -95,6 +98,36 @@ export default function SubscriptionPage() {
       setShowPaymentModal(true);
     }
   }, [plans]);
+
+  const fetchPayments = async () => {
+    if (!user) return;
+    try {
+      setLoadingInvoices(true);
+      const data = await api.subscriptions.payments();
+      setPayments(data || []);
+    } catch (error) {
+      console.error('Erro ao buscar faturas:', error);
+    } finally {
+      setLoadingInvoices(false);
+    }
+  };
+
+  const handleRenewNow = () => {
+    // Scroll suave até a seção de planos
+    const plansSection = document.getElementById('plans-selection');
+    if (plansSection) {
+      plansSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Se a seção não estiver visível (porque tem assinatura), podemos forçar a exibição
+      // Mas para manter simples, vamos apenas avisar ou mostrar os planos se o user quiser trocar
+      toast.info('Para mudar de plano, escolha uma das opções abaixo.');
+    }
+  };
+
+  const handleInvoices = () => {
+    fetchPayments();
+    setShowInvoicesModal(true);
+  };
 
   // Initial data fetch
   useEffect(() => {
@@ -338,11 +371,17 @@ export default function SubscriptionPage() {
               </div>
 
               <div className="flex flex-wrap gap-4 mt-12 border-t border-white/5 pt-10">
-                <button className="flex items-center space-x-3 bg-white text-black px-8 py-4 rounded-2xl font-black italic uppercase tracking-widest text-sm hover:bg-[#FF3131] transition-all transform active:scale-95 shadow-xl">
+                <button
+                  onClick={handleRenewNow}
+                  className="flex items-center space-x-3 bg-white text-black px-8 py-4 rounded-2xl font-black italic uppercase tracking-widest text-sm hover:bg-[#FF3131] transition-all transform active:scale-95 shadow-xl"
+                >
                   <RefreshCw className="h-5 w-5" />
                   <span>RENOVAR AGORA</span>
                 </button>
-                <button className="flex items-center space-x-3 bg-zinc-800 text-white px-8 py-4 rounded-2xl font-black italic uppercase tracking-widest text-sm hover:bg-zinc-700 transition-all transform active:scale-95">
+                <button
+                  onClick={handleInvoices}
+                  className="flex items-center space-x-3 bg-zinc-800 text-white px-8 py-4 rounded-2xl font-black italic uppercase tracking-widest text-sm hover:bg-zinc-700 transition-all transform active:scale-95"
+                >
                   <Download className="h-5 w-5" />
                   <span>FATURAS</span>
                 </button>
@@ -358,8 +397,8 @@ export default function SubscriptionPage() {
           )}
 
           {/* Plans Grid */}
-          {!currentSubscription && (
-            <div className="mb-20">
+          {(true) && ( // Sempre mostra os planos se quiser renovar ou trocar
+            <div id="plans-selection" className="mb-20">
               <div className="text-center mb-16">
                 <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase mb-4">EVOLUA SEU STATUS</h2>
                 <div className="w-24 h-1 bg-[#FF3131] mx-auto rounded-full mb-10"></div>
@@ -667,7 +706,7 @@ export default function SubscriptionPage() {
                         }}
                         className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all"
                       >
-                        <Download className="h-4 w-4 text-[#FF3131]" />
+                        <RefreshCw className="h-4 w-4 text-[#FF3131]" />
                       </button>
                     </div>
                   </div>
@@ -694,6 +733,63 @@ export default function SubscriptionPage() {
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Invoices/Faturas */}
+        {showInvoicesModal && (
+          <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
+            <div className="bg-zinc-900 border border-white/10 rounded-[48px] max-w-2xl w-full p-10 lg:p-12 shadow-3xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-[#FF3131] to-blue-600"></div>
+
+              <div className="flex justify-between items-center mb-10">
+                <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">MINHAS FATURAS</h3>
+                <button
+                  onClick={() => setShowInvoicesModal(false)}
+                  className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-gray-500 hover:text-white transition-all"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
+              </div>
+
+              {loadingInvoices ? (
+                <div className="text-center py-20">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#FF3131] border-t-transparent mx-auto"></div>
+                </div>
+              ) : payments.length === 0 ? (
+                <div className="text-center py-20 opacity-40">
+                  <Download className="h-16 w-16 mx-auto mb-6 text-gray-600" />
+                  <p className="font-black italic uppercase tracking-widest text-sm">Nenhuma fatura encontrada ainda</p>
+                </div>
+              ) : (
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-4 custom-scrollbar">
+                  {payments.map((p: any) => (
+                    <div key={p.id} className="bg-black/40 border border-white/5 rounded-3xl p-6 flex items-center justify-between group hover:border-white/10 transition-all">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-[#FF3131]">
+                          <Calendar className="h-6 w-6" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-1">{new Date(p.paid_at || p.created_at).toLocaleDateString('pt-BR')}</p>
+                          <h4 className="font-black text-white italic uppercase tracking-tight">{p.plan_name}</h4>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-black text-white italic tracking-tight">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.amount)}</p>
+                        <span className="text-[10px] font-black text-[#BFFF00] uppercase tracking-widest">{p.payment_method === 'pix' ? 'PIX' : 'CARTÃO'}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={() => setShowInvoicesModal(false)}
+                className="w-full mt-10 bg-white/5 text-white py-5 rounded-2xl font-black italic uppercase tracking-widest text-sm hover:bg-white/10 transition-all"
+              >
+                VOLTAR
+              </button>
             </div>
           </div>
         )}

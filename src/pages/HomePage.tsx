@@ -144,7 +144,7 @@ export default function HomePage() {
                 {/* Official Trincard Image */}
                 <div className="relative w-full max-w-[500px] overflow-hidden rounded-[30px] border border-white/10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] transform transition-transform duration-700 group-hover:rotate-y-12">
                   <img
-                    src="/trincard-official.jpg"
+                    src="/cartao-v2.png"
                     alt="Cartão Oficial Trincard"
                     className="w-full h-auto object-cover"
                   />

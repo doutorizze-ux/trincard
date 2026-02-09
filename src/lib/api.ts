@@ -53,6 +53,7 @@ export const api = {
             body: JSON.stringify({ planId })
         }),
         cancel: (id: string) => request(`/subscriptions/${id}`, { method: 'DELETE' }),
+        payments: () => request('/subscriptions/payments'),
     },
     checkout: {
         create: (data: any) => request('/checkout/create', { method: 'POST', body: JSON.stringify(data) }),

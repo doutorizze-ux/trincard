@@ -170,3 +170,21 @@ export const cancelSubscription = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Erro ao cancelar assinatura' });
     }
 };
+
+export const getUserPayments = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user.id;
+        const result = await pool.query(`
+            SELECT p.*, pl.name as plan_name
+            FROM payments p
+            JOIN subscriptions s ON p.subscription_id = s.id
+            JOIN plans pl ON s.plan_id = pl.id
+            WHERE p.user_id = $1
+            ORDER BY p.created_at DESC
+        `, [userId]);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Erro ao buscar pagamentos do usuário:', error);
+        res.status(500).json({ error: 'Erro ao buscar faturas' });
+    }
+};
