@@ -58,6 +58,9 @@ export const api = {
     checkout: {
         create: (data: any) => request('/checkout/create', { method: 'POST', body: JSON.stringify(data) }),
     },
+    public: {
+        getCard: (barcode: string) => request(`/public/card/${barcode}`),
+    },
     // Helper para formatar URLs de imagens/arquivos vindos do servidor
     getFileUrl: (path: string) => {
         if (!path) return '';

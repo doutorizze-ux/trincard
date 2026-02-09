@@ -15,15 +15,11 @@ export default function PublicCardPage() {
             if (!barcode) return;
             try {
                 setLoading(true);
-                // We'll need to add this to lib/api.ts or just fetch directly
-                const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/public/card/${barcode}`);
-                if (!response.ok) {
-                    throw new Error('Certificado não encontrado ou expirado.');
-                }
-                const result = await response.json();
+                const result = await api.public.getCard(barcode);
                 setData(result);
             } catch (err: any) {
-                setError(err.message);
+                console.error('Public card fetch error:', err);
+                setError(err.message || 'Cartão não encontrado ou expirado.');
             } finally {
                 setLoading(false);
             }
