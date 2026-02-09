@@ -54,8 +54,17 @@ export default function DashboardPage() {
         setSubscription(null);
       }
 
-      // For now, benefits and usage from API are empty as we haven't implemented those endpoints yet
-      setBenefits([]);
+      // Fetch actual partners to show as suggested benefits
+      try {
+        const partnersData = await api.partners.list();
+        // Map partner data to the view expected format if needed, 
+        // or we can adjust the render below.
+        setBenefits(partnersData || []);
+      } catch (err) {
+        console.error('Error fetching partners for benefits:', err);
+        setBenefits([]);
+      }
+
       setRecentUsage([]);
 
     } catch (error) {
@@ -300,12 +309,12 @@ export default function DashboardPage() {
                             <Star className="h-5 w-5" />
                           </div>
                           <div>
-                            <h4 className="font-black text-white italic uppercase tracking-tight text-sm">{benefit.title}</h4>
-                            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest line-clamp-1">{benefit.description}</p>
+                            <h4 className="font-black text-white italic uppercase tracking-tight text-sm">{benefit.company_name}</h4>
+                            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest line-clamp-1">{benefit.category} - {benefit.description}</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className="text-[#FF3131] font-black italic text-lg">{benefit.discount_percentage}%</span>
+                          <span className="text-[#FF3131] font-black italic text-lg">{benefit.percentage}%</span>
                           <span className="block text-[8px] text-gray-600 font-black uppercase tracking-widest">OFF</span>
                         </div>
                       </div>
