@@ -308,9 +308,9 @@ export function Layout({ children, showHeader = true, showFooter = true }: Layou
                     </div>
                     <span className="text-gray-400 font-bold group-hover:text-white transition-all">contato@trincard.com</span>
                   </li>
-                  <li className="text-gray-400 font-bold hover:text-white transition-colors cursor-pointer">(11) 9999-9999</li>
+                  <li className="text-gray-400 font-bold hover:text-white transition-colors cursor-pointer">(62) 98574-8806</li>
                   <li className="text-gray-500 text-sm mt-8 border-t border-white/5 pt-8">
-                    © 2024 TRINCARD.<br />Peak Performance Everywhere.
+                    © 2026 TRINCARD.<br />Peak Performance Everywhere.
                   </li>
                 </ul>
               </div>
