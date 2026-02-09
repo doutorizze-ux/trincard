@@ -29,7 +29,7 @@ import { User as AppUser, Partner, Subscription, Plan } from '../lib/supabase';
 import { toast } from 'sonner';
 import { PartnerCard, UserCard, SubscriptionCard, StatsCard } from '../components/MemoizedComponents';
 
-type TabType = 'overview' | 'users' | 'partners' | 'subscriptions' | 'plans';
+type TabType = 'overview' | 'users' | 'partners' | 'subscriptions' | 'plans' | 'finance';
 
 export default function AdminPage() {
   const { userProfile } = useAuth();
@@ -56,6 +56,7 @@ export default function AdminPage() {
     pendingPartners: 0,
     monthlyRevenue: 0
   });
+  const [financialData, setFinancialData] = useState<any>(null);
 
   // Memoized stats calculation
   const memoizedStats = useMemo(() => ({
@@ -84,30 +85,29 @@ export default function AdminPage() {
       setLastFetch(Date.now());
 
       // Fetch all data in parallel
-      const [usersData, partnersData, subscriptionsData, plansData] = await Promise.all([
+      const [usersData, partnersData, subscriptionsData, plansData, financialSummaryData] = await Promise.all([
         api.users.list().catch(() => []),
         api.partners.list().catch(() => []),
         api.subscriptions.list().catch(() => []),
-        api.plans.list().catch(() => [])
+        api.plans.list().catch(() => []),
+        (api as any).admin.financialSummary().catch(() => null)
       ]);
 
       setUsers(usersData);
       setPartners(partnersData);
       setSubscriptions(subscriptionsData);
       setPlans(plansData);
+      setFinancialData(financialSummaryData);
 
-      // Calculate stats
+      // Calculate stats or use from backend
       const activeSubscriptions = subscriptionsData.filter((s: Subscription) => s.status === 'active').length;
       const pendingPartners = partnersData.filter((p: Partner) => p.approval_status === 'pending_documentation').length;
-      const monthlyRevenue = subscriptionsData
-        .filter((s: Subscription) => s.status === 'active')
-        .reduce((sum: number, s: Subscription) => sum + (s.plans?.price || 0), 0);
 
       setStats({
         totalUsers: usersData.length,
         activeSubscriptions,
         pendingPartners,
-        monthlyRevenue
+        monthlyRevenue: financialSummaryData?.summary?.monthlyRevenue || 0
       });
 
     } catch (error) {
@@ -388,7 +388,8 @@ export default function AdminPage() {
                   { id: 'users', label: 'Usuários', icon: Users },
                   { id: 'partners', label: 'Parceiros', icon: Building },
                   { id: 'subscriptions', label: 'Assinaturas', icon: CreditCard },
-                  { id: 'plans', label: 'Planos', icon: FileText }
+                  { id: 'plans', label: 'Planos', icon: FileText },
+                  { id: 'finance', label: 'Financeiro', icon: DollarSign }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -869,6 +870,116 @@ export default function AdminPage() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+
+              {activeTab === 'finance' && (
+                <div className="space-y-8">
+                  {/* Financial Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-zinc-900 border border-white/5 rounded-3xl p-8">
+                      <p className="text-gray-500 font-bold uppercase tracking-widest text-xs mb-2">RECEITA TOTAL ACUMULADA</p>
+                      <div className="flex items-center space-x-3">
+                        <DollarSign className="h-8 w-8 text-green-500" />
+                        <h3 className="text-4xl font-black text-white italic tracking-tighter">
+                          {formatCurrency(financialData?.summary?.totalRevenue || 0)}
+                        </h3>
+                      </div>
+                    </div>
+                    <div className="bg-zinc-900 border border-white/5 rounded-3xl p-8">
+                      <p className="text-[#BFFF00] font-black uppercase tracking-widest text-xs mb-2">RECEITA ESTE MÊS</p>
+                      <div className="flex items-center space-x-3">
+                        <TrendingUp className="h-8 w-8 text-[#BFFF00]" />
+                        <h3 className="text-4xl font-black text-white italic tracking-tighter">
+                          {formatCurrency(financialData?.summary?.monthlyRevenue || 0)}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Revenue by Plan */}
+                    <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                      <h3 className="text-lg font-black text-gray-900 uppercase italic tracking-tight mb-6 flex items-center">
+                        <FileText className="h-5 w-5 mr-2 text-blue-600" />
+                        Receita por Plano
+                      </h3>
+                      <div className="space-y-4">
+                        {financialData?.planRevenue?.map((pr: any, i: number) => (
+                          <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <span className="font-bold text-gray-700">{pr.plan_name}</span>
+                            <div className="text-right">
+                              <p className="font-black text-gray-900">{formatCurrency(pr.total)}</p>
+                              <p className="text-[10px] text-gray-500 uppercase font-bold">{pr.count} vendas</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Revenue by Method */}
+                    <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                      <h3 className="text-lg font-black text-gray-900 uppercase italic tracking-tight mb-6 flex items-center">
+                        <CreditCard className="h-5 w-5 mr-2 text-[#FF3131]" />
+                        Métodos de Pagamento
+                      </h3>
+                      <div className="space-y-4">
+                        {financialData?.methodRevenue?.map((mr: any, i: number) => (
+                          <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <span className="font-bold text-gray-700 uppercase">{mr.payment_method === 'pix' ? 'PIX' : 'CARTÃO'}</span>
+                            <div className="text-right">
+                              <p className="font-black text-gray-900">{formatCurrency(mr.total)}</p>
+                              <p className="text-[10px] text-gray-500 uppercase font-bold">{mr.count} transações</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Recent Transactions Table */}
+                  <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+                    <div className="p-6 border-b border-gray-100">
+                      <h3 className="text-lg font-black text-gray-900 uppercase italic tracking-tight">Últimas Transações</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Data</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Usuário</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Plano</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Valor</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {financialData?.recentTransactions?.map((tx: any) => (
+                            <tr key={tx.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                {formatDate(tx.paid_at || tx.created_at)}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                                {tx.user_name}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 uppercase font-bold">
+                                {tx.plan_name}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-black text-gray-900">
+                                {formatCurrency(tx.amount)}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`px-2 py-1 rounded-full text-[10px] font-black uppercase ${tx.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                  }`}>
+                                  {tx.status === 'completed' ? 'CONCLUÍDO' : 'PENDENTE'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

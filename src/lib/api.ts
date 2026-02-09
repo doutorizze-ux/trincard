@@ -61,6 +61,9 @@ export const api = {
     public: {
         getCard: (barcode: string) => request(`/public/card/${barcode}`),
     },
+    admin: {
+        financialSummary: () => request('/admin/financial-summary'),
+    },
     // Helper para formatar URLs de imagens/arquivos vindos do servidor
     getFileUrl: (path: string) => {
         if (!path) return '';

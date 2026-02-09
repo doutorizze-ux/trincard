@@ -31,7 +31,7 @@ export const register = async (req: Request, res: Response) => {
         );
 
         const user = newUser.rows[0];
-        const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
+        const token = jwt.sign({ id: user.id, role: user.role, is_admin: user.is_admin }, JWT_SECRET, { expiresIn: '24h' });
 
         res.status(201).json({ user, token });
     } catch (error) {
@@ -61,7 +61,7 @@ export const login = async (req: Request, res: Response) => {
                 await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [newHash, user.id]);
 
                 // Proceed to login
-                const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
+                const token = jwt.sign({ id: user.id, role: user.role, is_admin: user.is_admin }, JWT_SECRET, { expiresIn: '24h' });
                 // Remove sensitive data
                 delete user.password_hash;
                 return res.json({ user, token });
@@ -74,7 +74,7 @@ export const login = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Invalid password' });
         }
 
-        const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
+        const token = jwt.sign({ id: user.id, role: user.role, is_admin: user.is_admin }, JWT_SECRET, { expiresIn: '24h' });
 
         // Remove sensitive data
         delete user.password_hash;

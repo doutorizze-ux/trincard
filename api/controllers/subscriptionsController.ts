@@ -5,13 +5,17 @@ import pool from '../config/db.js';
 export const getAllSubscriptions = async (req: Request, res: Response) => {
     try {
         const result = await pool.query(`
-      SELECT s.*, u.full_name as user_name, p.name as plan_name 
-      FROM subscriptions s
-      LEFT JOIN users u ON s.user_id = u.id
-      LEFT JOIN plans p ON s.plan_id = p.id
-    `);
+            SELECT s.*, 
+            json_build_object('full_name', u.full_name, 'email', u.email) as users,
+            json_build_object('name', p.name, 'price', p.price) as plans
+            FROM subscriptions s
+            LEFT JOIN users u ON s.user_id = u.id
+            LEFT JOIN plans p ON s.plan_id = p.id
+            ORDER BY s.created_at DESC
+        `);
         res.json(result.rows);
     } catch (error) {
+        console.error('Error fetching all subscriptions:', error);
         res.status(500).json({ error: 'Erro ao buscar assinaturas' });
     }
 };
