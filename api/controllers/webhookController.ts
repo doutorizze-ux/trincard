@@ -35,12 +35,23 @@ export const handleAsaasWebhook = async (req: Request, res: Response) => {
         }
 
         try {
-            // 2. Iniciar transação no banco
+            // 2. Evitar duplicidade: verificar se este pagamento já foi processado
+            const checkDuplicate = await pool.query(
+                'SELECT id FROM payments WHERE transaction_id = $1',
+                [payment.id]
+            );
+
+            if (checkDuplicate.rows.length > 0) {
+                console.log(`[Webhook] Pagamento ${payment.id} já processado anteriormente. Ignorando.`);
+                return res.status(200).json({ success: true, message: 'Já processado' });
+            }
+
+            // 3. Iniciar transação no banco
             const client = await pool.connect();
             try {
                 await client.query('BEGIN');
 
-                // 2.1 Buscar detalhes do plano para calcular a duração exata
+                // 3.1 Buscar detalhes do plano para calcular a duração exata
                 const planResult = await client.query('SELECT name FROM plans WHERE id = $1', [actualPlanId]);
                 const planName = planResult.rows[0]?.name || '';
 

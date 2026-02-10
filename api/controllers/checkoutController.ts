@@ -76,11 +76,12 @@ export const createCheckout = async (req: Request, res: Response) => {
         const billingType = req.body.billingType || "UNDEFINED";
         const cardData = req.body.cardData;
 
-        const subscriptionPayload: any = {
+        const subPayload: any = {
             customer: customerId,
             billingType: billingType,
             value: Number(price),
-            nextDueDate: new Date().toLocaleDateString('sv-SE'), // Garante o yyyy-mm-dd na data local (evita pular dia no UTC à noite)
+            // BUG FIX: Usa explicitamente o fuso de Brasília para evitar que às 21h (00h UTC) o vencimento pule para amanhã
+            nextDueDate: new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' }),
             cycle: "MONTHLY",
             description: title,
             externalReference: `${userId}:${planId}`
@@ -96,18 +97,18 @@ export const createCheckout = async (req: Request, res: Response) => {
             const userData = userDataResult.rows[0] || {};
             const userAddress = userData.address || {};
 
-            subscriptionPayload.creditCard = {
+            subPayload.creditCard = {
                 holderName: cardData.holderName,
                 number: cardData.number,
                 expiryMonth: cardData.expiryMonth,
                 expiryYear: cardData.expiryYear,
                 ccv: cardData.cvv
             };
-            subscriptionPayload.creditCardHolderInfo = {
+            subPayload.creditCardHolderInfo = {
                 name: cardData.holderName,
                 email: userEmail,
                 cpfCnpj: cpfCnpj ? cpfCnpj.replace(/\D/g, '') : '',
-                postalCode: userAddress.postalCode || userAddress.postal_code || '01310100', // Usa CEP do usuário ou fallback
+                postalCode: userAddress.postalCode || userAddress.postal_code || '01310100',
                 addressNumber: userAddress.number || '100',
                 addressComplement: 'Assinatura Trincard',
                 phone: userData.phone || '62999999999'
@@ -117,7 +118,7 @@ export const createCheckout = async (req: Request, res: Response) => {
         const subRes = await fetch(`${ASAAS_URL}/subscriptions`, {
             method: 'POST',
             headers,
-            body: JSON.stringify(subscriptionPayload)
+            body: JSON.stringify(subPayload)
         });
 
         const subData: any = await subRes.json();
@@ -127,49 +128,81 @@ export const createCheckout = async (req: Request, res: Response) => {
             return res.status(400).json({ error: `Erro ao criar assinatura: ${subData.errors[0].description}` });
         }
 
-        // SALVAR ASSINATURA PENDENTE NO BANCO
-        // Isso garante que temos um registro local mesmo se o webhook falhar
-        try {
-            // Gerar código de barras temporário
-            const tempBarcode = Math.floor(100000000000 + Math.random() * 900000000000).toString();
-
-            await pool.query(`
-                INSERT INTO subscriptions (
-                    user_id, plan_id, gateway_id, status, barcode, due_date, start_date, end_date, created_at, updated_at
-                ) VALUES ($1, $2, $3, 'pending', $4, $5, NOW(), NOW(), NOW(), NOW())
-            `, [
-                userId,
-                planId,
-                subData.id,
-                tempBarcode,
-                subData.nextDueDate
-            ]);
-            console.log(`Assinatura pendente criada localmente para user ${userId} com gateway_id ${subData.id}`);
-        } catch (dbError) {
-            console.error('Erro ao salvar assinatura pendente no banco:', dbError);
-            // Não falhar o request por isso, mas logar o erro
-        }
-
         // 3. Buscar o Link de Pagamento e dados de PIX
         const paymentsRes = await fetch(`${ASAAS_URL}/subscriptions/${subData.id}/payments`, { headers });
         const paymentsData: any = await paymentsRes.json();
 
-        if (paymentsData.data && paymentsData.data.length > 0) {
-            const firstPayment = paymentsData.data[0];
+        // Determinar status inicial (se já pagou no cartão, ativa agora!)
+        let initialStatus = 'pending';
+        let firstPayment = null;
 
-            // 4. Buscar QR Code se for PIX (opcional mas recomendado para Pix Transparente)
+        if (paymentsData.data && paymentsData.data.length > 0) {
+            firstPayment = paymentsData.data[0];
+            const confirmedStatus = ['RECEIVED', 'CONFIRMED', 'RECEIVED_IN_CASH'];
+            if (confirmedStatus.includes(firstPayment.status)) {
+                initialStatus = 'active';
+            }
+        }
+
+        // SALVAR ASSINATURA NO BANCO
+        try {
+            const tempBarcode = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+
+            // Datas para o registro local
+            const startDate = new Date();
+            const endDate = new Date();
+            endDate.setDate(startDate.getDate() + 30); // Default 30 dias, webhook ajustará se for anual
+
+            const subResult = await pool.query(`
+                INSERT INTO subscriptions (
+                    user_id, plan_id, gateway_id, status, barcode, due_date, start_date, end_date, created_at, updated_at
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
+                RETURNING id
+            `, [
+                userId,
+                planId,
+                subData.id,
+                initialStatus,
+                tempBarcode,
+                subData.nextDueDate,
+                startDate.toISOString(),
+                endDate.toISOString()
+            ]);
+
+            if (initialStatus === 'active' && firstPayment) {
+                console.log(`[Checkout] Ativação imediata para user ${userId} (Cartão confirmado)`);
+                await pool.query(`
+                    INSERT INTO payments (subscription_id, user_id, amount, payment_method, status, transaction_id, paid_at, created_at)
+                    VALUES ($1, $2, $3, $4, 'completed', $5, NOW(), NOW())
+                `, [
+                    subResult.rows[0].id,
+                    userId,
+                    firstPayment.value,
+                    'credit_card',
+                    firstPayment.id
+                ]);
+            }
+        } catch (dbError) {
+            console.error('Erro ao salvar assinatura no banco:', dbError);
+        }
+
+        if (firstPayment) {
+            // 4. Buscar QR Code se for PIX
             let pixData = null;
-            try {
-                const pixRes = await fetch(`${ASAAS_URL}/payments/${firstPayment.id}/pixQrCode`, { headers });
-                pixData = await pixRes.json();
-            } catch (pError) {
-                console.error('Erro ao buscar QR Code Pix:', pError);
+            if (billingType === 'PIX') {
+                try {
+                    const pixRes = await fetch(`${ASAAS_URL}/payments/${firstPayment.id}/pixQrCode`, { headers });
+                    pixData = await pixRes.json();
+                } catch (pError) {
+                    console.error('Erro ao buscar QR Code Pix:', pError);
+                }
             }
 
             res.json({
-                init_point: firstPayment.invoiceUrl, // Mantemos para fallback
+                init_point: firstPayment.invoiceUrl,
                 payment_id: firstPayment.id,
                 subscription_id: subData.id,
+                status: initialStatus,
                 value: firstPayment.value,
                 pix: pixData?.encodedImage ? {
                     qrCode: pixData.encodedImage,

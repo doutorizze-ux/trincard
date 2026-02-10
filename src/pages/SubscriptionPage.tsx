@@ -224,10 +224,14 @@ export default function SubscriptionPage() {
         setCheckoutStep('pix');
         toast.success('Pix gerado com sucesso!');
       } else if (data && paymentMethod === 'credit_card') {
-        toast.success('Assinatura processada! Seu plano será ativado em instantes.');
+        if (data.status === 'active') {
+          toast.success('PAGAMENTO CONFIRMADO! Seu plano já está ativo.');
+        } else {
+          toast.success('Assinatura processada! Seu plano será ativado em instantes.');
+        }
         setShowPaymentModal(false);
         setCheckoutStep('options');
-        fetchData();
+        await fetchData(); // Aguarda atualização dos dados locais
       } else if (data && data.init_point) {
         window.location.href = data.init_point;
       } else {

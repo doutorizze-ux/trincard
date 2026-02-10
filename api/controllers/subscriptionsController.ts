@@ -44,15 +44,57 @@ export const getUserSubscription = async (req: Request, res: Response) => {
 
         const subscription = result.rows[0];
 
-        // Se for pendente e tiver gateway_id, verifica no Asaas se já pagou
-        // ATENÇÃO: A assinatura no Asaas nasce como 'ACTIVE'. Isso não significa 'PAGA'.
-        // Devemos esperar o Webhook 'PAYMENT_CONFIRMED' para ativar o acesso.
-        // Removida a auto-ativação baseada apenas no status da assinatura para evitar falsos positivos.
-        /* 
+        // Fallback: Se for pendente e tiver gateway_id, verifica no Asaas se já pagou
+        // Isso resolve atrasos no Webhook durante o lançamento
         if (subscription.status === 'pending' && subscription.gateway_id) {
-           ... (código removido para segurança) ...
+            try {
+                const ASAAS_API_KEY = process.env.ASAAS_API_KEY;
+                const ASAAS_URL = process.env.ASAAS_URL || process.env.ASAAS_API_URI || 'https://www.asaas.com/api/v3';
+
+                if (ASAAS_API_KEY) {
+                    console.log(`[Polling Fallback] Verificando status da assinatura ${subscription.gateway_id} no Asaas...`);
+                    const response = await fetch(`${ASAAS_URL}/subscriptions/${subscription.gateway_id}/payments`, {
+                        headers: { 'access_token': ASAAS_API_KEY }
+                    });
+                    const paymentsData: any = await response.json();
+
+                    if (paymentsData.data && paymentsData.data.length > 0) {
+                        const firstPayment = paymentsData.data[0];
+                        const confirmedStatus = ['RECEIVED', 'CONFIRMED', 'RECEIVED_IN_CASH'];
+
+                        if (confirmedStatus.includes(firstPayment.status)) {
+                            console.log(`[Polling Fallback] Pagamento confirmado no Asaas (${firstPayment.status}). Ativando localmente...`);
+
+                            // Ativar a assinatura no banco (Lógica similar ao webhook mas simplificada para o registro específico)
+                            await pool.query(`
+                                UPDATE subscriptions 
+                                SET status = 'active', updated_at = NOW() 
+                                WHERE id = $1
+                            `, [subscription.id]);
+
+                            // Registrar o pagamento se não existir
+                            const checkPayment = await pool.query('SELECT id FROM payments WHERE transaction_id = $1', [firstPayment.id]);
+                            if (checkPayment.rows.length === 0) {
+                                await pool.query(`
+                                    INSERT INTO payments (subscription_id, user_id, amount, payment_method, status, transaction_id, paid_at, created_at)
+                                    VALUES ($1, $2, $3, $4, 'completed', $5, NOW(), NOW())
+                                `, [
+                                    subscription.id,
+                                    subscription.user_id,
+                                    firstPayment.value,
+                                    firstPayment.billingType?.toLowerCase() || 'credit_card',
+                                    firstPayment.id
+                                ]);
+                            }
+
+                            subscription.status = 'active'; // Atualiza objeto de retorno
+                        }
+                    }
+                }
+            } catch (pollError) {
+                console.error('[Polling Fallback] Erro ao verificar status no Asaas:', pollError);
+            }
         }
-        */
 
         res.json(subscription);
     } catch (error) {
