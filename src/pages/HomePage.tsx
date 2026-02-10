@@ -191,15 +191,13 @@ export default function HomePage() {
         <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col lg:flex-row justify-between items-end mb-20 gap-8">
-            <div className="text-left max-w-2xl">
-              <h2 className="text-5xl lg:text-8xl font-black text-white italic tracking-tighter uppercase leading-none mb-6">
-                PLANO DE <span className="text-[#FF3131]">STATUS</span>
-              </h2>
-              <p className="text-xl text-gray-500 font-medium leading-relaxed">
-                Escolha o nível de acesso que melhor se adapta à sua rotina. Benefícios reais para uma vida premium.
-              </p>
-            </div>
+          <div className="text-center mb-20">
+            <h2 className="text-5xl lg:text-8xl font-black text-white italic tracking-tighter uppercase leading-none mb-6">
+              PLANO DE <span className="text-[#FF3131]">STATUS</span>
+            </h2>
+            <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-2xl mx-auto">
+              Escolha o nível de acesso que melhor se adapta à sua rotina. Benefícios reais para uma vida premium.
+            </p>
           </div>
 
           {loading ? (
@@ -207,9 +205,9 @@ export default function HomePage() {
               <div className="w-16 h-16 border-4 border-[#FF3131] border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="flex flex-wrap justify-center gap-8">
               {plans.map((plan) => (
-                <div key={plan.id} className="relative group perspective-1000">
+                <div key={plan.id} className="relative group perspective-1000 w-full max-w-sm">
                   <div className={`h-full bg-zinc-900 rounded-[50px] p-12 border transition-all duration-500 ${plan.features?.exclusive_benefits ? 'border-[#FF3131] ring-1 ring-[#FF3131] scale-105 z-10' : 'border-white/5 hover:border-white/20'}`}>
                     {plan.features?.exclusive_benefits && (
                       <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-[#FF3131] text-black px-6 py-1.5 rounded-full font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(255,49,49,0.5)]">
