@@ -39,6 +39,9 @@ export const createPartner = async (req: Request, res: Response) => {
         contact_phone,
         notes,
         contract_url,
+        logo_url,
+        description,
+        city,
         created_by
     } = req.body;
 
@@ -46,11 +49,13 @@ export const createPartner = async (req: Request, res: Response) => {
         const { rows } = await query(
             `INSERT INTO partners (
         company_name, category, address, contact_info, percentage, 
-        contact_email, contact_phone, notes, contract_url, created_by
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+        contact_email, contact_phone, notes, contract_url, logo_url,
+        description, city, created_by
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
             [
                 company_name, category, address, contact_info, percentage,
-                contact_email, contact_phone, notes, contract_url, created_by
+                contact_email, contact_phone, notes, contract_url, logo_url,
+                description, city, created_by
             ]
         );
         res.status(201).json(rows[0]);

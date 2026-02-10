@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, Percent, Mail, Phone, FileText, Save, X } from 'lucide-react';
+import { Building2, Percent, Mail, Phone, FileText, Save, X, MapPin } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import FileUpload from './FileUpload';
@@ -7,13 +7,17 @@ import { toast } from 'sonner';
 
 interface PartnerFormData {
   company_name: string;
+  category: string;
+  description: string;
+  city: string;
+  address: string;
   percentage: number;
   contact_email: string;
   contact_phone: string;
   notes: string;
   contract_url?: string;
   logo_url?: string;
-  approval_status: 'pending_documentation' | 'approved' | 'rejected';
+  approval_status: 'pending_documentation' | 'approved' | 'rejected' | 'pending';
   document_status: 'missing' | 'uploaded' | 'verified';
 }
 
@@ -34,6 +38,10 @@ export default function PartnerForm({
   // Inicializa o estado DIRETAMENTE dos props (já que usamos key prop no pai)
   const [formData, setFormData] = useState<PartnerFormData>({
     company_name: partner?.company_name || '',
+    category: partner?.category || 'Geral',
+    description: partner?.description || '',
+    city: partner?.city || '',
+    address: partner?.address || '',
     percentage: partner?.percentage || 0,
     contact_email: partner?.contact_email || '',
     contact_phone: partner?.contact_phone || '',
@@ -139,13 +147,11 @@ export default function PartnerForm({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Nome da Empresa */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Building2 className="h-4 w-4 inline mr-2" />
               Nome da Empresa *
             </label>
-            {/* Company Name Input */}
             <input
               type="text"
               value={formData.company_name}
@@ -159,6 +165,86 @@ export default function PartnerForm({
             {errors.company_name && (
               <p className="text-red-500 text-sm mt-1">{errors.company_name}</p>
             )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Categoria */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Categoria
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => handleInputChange('category', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                disabled={loading}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <option value="Geral">Geral</option>
+                <option value="Saúde">Saúde</option>
+                <option value="Farmácias">Farmácias</option>
+                <option value="Esportes">Esportes</option>
+                <option value="Lojas">Lojas</option>
+                <option value="Alimentação">Alimentação</option>
+                <option value="Hospitais">Hospitais</option>
+                <option value="Consultas">Consultas</option>
+                <option value="Educação">Educação</option>
+                <option value="Entretenimento">Entretenimento</option>
+                <option value="Beleza">Beleza</option>
+                <option value="Tecnologia">Tecnologia</option>
+                <option value="Varejo">Varejo</option>
+                <option value="Serviços">Serviços</option>
+              </select>
+            </div>
+
+            {/* Cidade */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Cidade
+              </label>
+              <input
+                type="text"
+                value={formData.city}
+                onChange={(e) => handleInputChange('city', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                placeholder="Ex: São Paulo"
+                disabled={loading}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          </div>
+
+          {/* Endereço */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <MapPin className="h-4 w-4 inline mr-2" />
+              Endereço Completo
+            </label>
+            <input
+              type="text"
+              value={formData.address}
+              onChange={(e) => handleInputChange('address', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+              placeholder="Rua, número, bairro..."
+              disabled={loading}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+
+          {/* Descrição */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Descrição do Parceiro
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+              placeholder="Fale um pouco sobre o parceiro e benefícios oferecidos..."
+              disabled={loading}
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
 
           {/* Porcentagem */}
