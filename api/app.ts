@@ -25,6 +25,10 @@ const __dirname = path.dirname(__filename);
 // load env
 dotenv.config();
 
+import { ensureColumnsExist } from './config/db.js';
+// Executa a correção do banco de dados em background
+ensureColumnsExist();
+
 const app: express.Application = express();
 
 app.use(cors());
