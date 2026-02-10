@@ -80,7 +80,7 @@ export const createCheckout = async (req: Request, res: Response) => {
             customer: customerId,
             billingType: billingType,
             value: Number(price),
-            nextDueDate: new Date().toISOString().split('T')[0],
+            nextDueDate: new Date().toLocaleDateString('sv-SE'), // Garante o yyyy-mm-dd na data local (evita pular dia no UTC à noite)
             cycle: "MONTHLY",
             description: title,
             externalReference: `${userId}:${planId}`
