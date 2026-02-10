@@ -251,6 +251,86 @@ export default function AdminPage() {
     setEditingPlan(null);
   };
 
+  const handleExport = () => {
+    let dataToExport: any[] = [];
+    let filename = '';
+    let headers: string[] = [];
+
+    switch (activeTab) {
+      case 'users':
+        dataToExport = filteredUsers;
+        filename = `usuarios_trincard_${new Date().toISOString().split('T')[0]}.csv`;
+        headers = ['ID', 'Nome', 'Email', 'Telefone', 'Tipo de Cartão', 'Status', 'Data de Cadastro'];
+        break;
+      case 'partners':
+        dataToExport = filteredPartners;
+        filename = `parceiros_trincard_${new Date().toISOString().split('T')[0]}.csv`;
+        headers = ['ID', 'Empresa', 'Email', 'Telefone', 'Comissão %', 'Status', 'Data de Cadastro'];
+        break;
+      case 'subscriptions':
+        dataToExport = filteredSubscriptions;
+        filename = `assinaturas_trincard_${new Date().toISOString().split('T')[0]}.csv`;
+        headers = ['ID', 'Usuário', 'Plano', 'Status', 'Valor', 'Vencimento'];
+        break;
+      case 'plans':
+        dataToExport = plans;
+        filename = `planos_trincard_${new Date().toISOString().split('T')[0]}.csv`;
+        headers = ['ID', 'Nome', 'Preço', 'Ativo', 'Descrição'];
+        break;
+      case 'finance':
+        dataToExport = financialData?.recentTransactions || [];
+        filename = `financeiro_trincard_${new Date().toISOString().split('T')[0]}.csv`;
+        headers = ['ID', 'Data', 'Usuário', 'Plano', 'Valor', 'Status'];
+        break;
+      default:
+        toast.error('Não há dados para exportar nesta aba');
+        return;
+    }
+
+    if (dataToExport.length === 0) {
+      toast.error('Nenhum dado encontrado para exportar');
+      return;
+    }
+
+    // Convert data to CSV string
+    const csvRows = [headers.join(',')];
+
+    dataToExport.forEach(item => {
+      let row: string[] = [];
+      if (activeTab === 'users') {
+        row = [item.id, item.full_name, item.email, item.phone, item.card_type, item.is_active ? 'Ativo' : 'Inativo', item.created_at];
+      } else if (activeTab === 'partners') {
+        row = [item.id, item.company_name, item.contact_email, item.contact_phone, item.percentage.toString(), item.approval_status, item.created_at];
+      } else if (activeTab === 'subscriptions') {
+        row = [item.id, item.users?.full_name || 'N/A', item.plans?.name || 'N/A', item.status, item.plans?.price?.toString() || '0', item.due_date];
+      } else if (activeTab === 'plans') {
+        row = [item.id, item.name, item.price.toString(), item.is_active ? 'Sim' : 'Não', item.description];
+      } else if (activeTab === 'finance') {
+        row = [item.id, item.paid_at || item.created_at, item.user_name, item.plan_name, item.amount.toString(), item.status];
+      }
+
+      const cleanRowSource = row.map(val => {
+        const str = String(val || '').replace(/"/g, '""');
+        return `"${str}"`;
+      });
+      csvRows.push(cleanRowSource.join(','));
+    });
+
+    const csvContent = "\uFEFF" + csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success('Exportação concluída com sucesso!');
+  };
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -487,7 +567,10 @@ export default function AdminPage() {
                     </button>
                   )}
 
-                  <button className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                  <button
+                    onClick={handleExport}
+                    className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                  >
                     <Download className="h-4 w-4" />
                     <span>Exportar</span>
                   </button>
