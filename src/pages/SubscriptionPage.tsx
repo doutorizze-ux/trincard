@@ -531,7 +531,7 @@ export default function SubscriptionPage() {
         {/* Payment Modal Refactored for Sporty Theme */}
         {showPaymentModal && (
           <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
-            <div className="bg-zinc-900 border border-white/10 rounded-[48px] max-w-lg w-full p-10 lg:p-12 shadow-3xl relative overflow-hidden">
+            <div className="bg-zinc-900 border border-white/10 rounded-[48px] max-w-lg w-full p-10 lg:p-12 shadow-3xl relative overflow-y-auto max-h-[90vh] custom-scrollbar">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-[#FF3131] to-blue-600"></div>
 
               <div className="flex justify-between items-center mb-10">
@@ -740,7 +740,7 @@ export default function SubscriptionPage() {
         {/* Modal de Invoices/Faturas */}
         {showInvoicesModal && (
           <div className="fixed inset-0 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
-            <div className="bg-zinc-900 border border-white/10 rounded-[48px] max-w-2xl w-full p-10 lg:p-12 shadow-3xl relative overflow-hidden">
+            <div className="bg-zinc-900 border border-white/10 rounded-[48px] max-w-2xl w-full p-10 lg:p-12 shadow-3xl relative overflow-y-auto max-h-[90vh] custom-scrollbar">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-[#FF3131] to-blue-600"></div>
 
               <div className="flex justify-between items-center mb-10">

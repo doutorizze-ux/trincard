@@ -50,7 +50,7 @@ export default function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onCancel}>
-            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-semibold text-gray-900">Editar Usuário</h2>
                     <button onClick={onCancel} className="text-gray-400 hover:text-gray-600">
