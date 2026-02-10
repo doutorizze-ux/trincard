@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/Layout';
 import PartnerForm from '../components/PartnerForm';
@@ -252,83 +254,147 @@ export default function AdminPage() {
   };
 
   const handleExport = () => {
-    let dataToExport: any[] = [];
+    const doc = new jsPDF();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('pt-BR');
+    const timeStr = now.toLocaleTimeString('pt-BR');
+
+    let reportTitle = '';
+    let headers: string[][] = [];
+    let body: any[][] = [];
     let filename = '';
-    let headers: string[] = [];
+
+    // Configurações comuns do relatório
+    const addHeader = (title: string) => {
+      // Retângulo decorativo no topo
+      doc.setFillColor(5, 5, 5); // Preto Trincard
+      doc.rect(0, 0, 210, 40, 'F');
+
+      // Título Trincard
+      doc.setTextColor(255, 49, 49); // Vermelho Trincard
+      doc.setFont('helvetica', 'bolditalic');
+      doc.setFontSize(24);
+      doc.text('TRINCARD', 15, 20);
+
+      // Subtítulo do Relatório
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text(title.toUpperCase(), 15, 30);
+
+      // Data e Hora
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Gerado em: ${dateStr} às ${timeStr}`, 140, 25);
+    };
 
     switch (activeTab) {
       case 'users':
-        dataToExport = filteredUsers;
-        filename = `usuarios_trincard_${new Date().toISOString().split('T')[0]}.csv`;
-        headers = ['ID', 'Nome', 'Email', 'Telefone', 'Tipo de Cartão', 'Status', 'Data de Cadastro'];
+        reportTitle = 'Relatório Geral de Usuários';
+        filename = `relatorio_usuarios_${now.toISOString().split('T')[0]}.pdf`;
+        headers = [['NOME', 'EMAIL', 'TELEFONE', 'TIPO CARD', 'STATUS']];
+        body = filteredUsers.map(u => [
+          u.full_name,
+          u.email,
+          u.phone || '-',
+          u.card_type === 'digital' ? 'Digital' : 'Físico',
+          u.is_active ? 'ATIVO' : 'INATIVO'
+        ]);
         break;
       case 'partners':
-        dataToExport = filteredPartners;
-        filename = `parceiros_trincard_${new Date().toISOString().split('T')[0]}.csv`;
-        headers = ['ID', 'Empresa', 'Email', 'Telefone', 'Comissão %', 'Status', 'Data de Cadastro'];
+        reportTitle = 'Relatório de Parceiros de Elite';
+        filename = `relatorio_parceiros_${now.toISOString().split('T')[0]}.pdf`;
+        headers = [['EMPRESA', 'EMAIL', 'CONTATO', 'COMISSÃO (%)', 'STATUS']];
+        body = filteredPartners.map(p => [
+          p.company_name,
+          p.contact_email || '-',
+          p.contact_phone || '-',
+          `${p.percentage}%`,
+          getStatusText(p.approval_status).toUpperCase()
+        ]);
         break;
       case 'subscriptions':
-        dataToExport = filteredSubscriptions;
-        filename = `assinaturas_trincard_${new Date().toISOString().split('T')[0]}.csv`;
-        headers = ['ID', 'Usuário', 'Plano', 'Status', 'Valor', 'Vencimento'];
+        reportTitle = 'Relatório de Assinaturas';
+        filename = `relatorio_assinaturas_${now.toISOString().split('T')[0]}.pdf`;
+        headers = [['USUÁRIO', 'PLANO', 'VALOR', 'VENCIMENTO', 'STATUS']];
+        body = filteredSubscriptions.map(s => [
+          s.users?.full_name || 'N/A',
+          s.plans?.name || 'N/A',
+          formatCurrency(Number(s.plans?.price || 0)),
+          formatDate(s.due_date),
+          s.status.toUpperCase()
+        ]);
         break;
       case 'plans':
-        dataToExport = plans;
-        filename = `planos_trincard_${new Date().toISOString().split('T')[0]}.csv`;
-        headers = ['ID', 'Nome', 'Preço', 'Ativo', 'Descrição'];
+        reportTitle = 'Portfólio de Planos Trincard';
+        filename = `relatorio_planos_${now.toISOString().split('T')[0]}.pdf`;
+        headers = [['NOME', 'VALOR', 'STATUS', 'DESCRIÇÃO']];
+        body = plans.map(p => [
+          p.name,
+          formatCurrency(Number(p.price)),
+          p.is_active ? 'ATIVO' : 'INATIVO',
+          p.description
+        ]);
         break;
       case 'finance':
-        dataToExport = financialData?.recentTransactions || [];
-        filename = `financeiro_trincard_${new Date().toISOString().split('T')[0]}.csv`;
-        headers = ['ID', 'Data', 'Usuário', 'Plano', 'Valor', 'Status'];
+        reportTitle = 'Relatório Financeiro de Performance';
+        filename = `relatorio_financeiro_${now.toISOString().split('T')[0]}.pdf`;
+        headers = [['DATA', 'USUÁRIO', 'PLANO', 'VALOR', 'MÉTODO']];
+        body = (financialData?.recentTransactions || []).map((tx: any) => [
+          formatDate(tx.paid_at || tx.created_at),
+          tx.user_name,
+          tx.plan_name,
+          formatCurrency(tx.amount),
+          tx.payment_method === 'pix' ? 'PIX' : 'CARTÃO'
+        ]);
         break;
       default:
-        toast.error('Não há dados para exportar nesta aba');
+        toast.error('Geração de PDF não disponível para esta aba');
         return;
     }
 
-    if (dataToExport.length === 0) {
+    if (body.length === 0) {
       toast.error('Nenhum dado encontrado para exportar');
       return;
     }
 
-    // Convert data to CSV string
-    const csvRows = [headers.join(',')];
+    addHeader(reportTitle);
 
-    dataToExport.forEach(item => {
-      let row: string[] = [];
-      if (activeTab === 'users') {
-        row = [item.id, item.full_name, item.email, item.phone, item.card_type, item.is_active ? 'Ativo' : 'Inativo', item.created_at];
-      } else if (activeTab === 'partners') {
-        row = [item.id, item.company_name, item.contact_email, item.contact_phone, item.percentage.toString(), item.approval_status, item.created_at];
-      } else if (activeTab === 'subscriptions') {
-        row = [item.id, item.users?.full_name || 'N/A', item.plans?.name || 'N/A', item.status, item.plans?.price?.toString() || '0', item.due_date];
-      } else if (activeTab === 'plans') {
-        row = [item.id, item.name, item.price.toString(), item.is_active ? 'Sim' : 'Não', item.description];
-      } else if (activeTab === 'finance') {
-        row = [item.id, item.paid_at || item.created_at, item.user_name, item.plan_name, item.amount.toString(), item.status];
+    autoTable(doc, {
+      head: headers,
+      body: body,
+      startY: 45,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [5, 5, 5],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 10,
+        halign: 'center'
+      },
+      styles: {
+        fontSize: 9,
+        cellPadding: 4,
+        valign: 'middle'
+      },
+      alternateRowStyles: {
+        fillColor: [250, 250, 250]
+      },
+      margin: { left: 15, right: 15 },
+      didDrawPage: function (data) {
+        // Rodapé em cada página
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(
+          `Trincard - Performance & Benefícios Industriais | Página ${data.pageNumber}`,
+          15,
+          doc.internal.pageSize.height - 10
+        );
       }
-
-      const cleanRowSource = row.map(val => {
-        const str = String(val || '').replace(/"/g, '""');
-        return `"${str}"`;
-      });
-      csvRows.push(cleanRowSource.join(','));
     });
 
-    const csvContent = "\uFEFF" + csvRows.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-
-    link.setAttribute('href', url);
-    link.setAttribute('download', filename);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    toast.success('Exportação concluída com sucesso!');
+    doc.save(filename);
+    toast.success('PDF gerado e pronto para download!');
   };
 
   const formatCurrency = (value: number) => {
