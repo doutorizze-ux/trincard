@@ -30,8 +30,9 @@ export const handleAsaasWebhook = async (req: Request, res: Response) => {
         const actualPlanId = parts[1];
 
         if (!actualUserId || !actualPlanId) {
-            console.error('Webhook: Dados do usuário ou plano não encontrados no externalReference', payment?.externalReference);
-            return res.status(400).json({ error: 'Referência externa inválida' });
+            console.warn('Webhook: Ignorando evento sem externalReference válida (userId:planId):', payment?.externalReference);
+            // Retornamos 200 para o Asaas não considerar erro e não penalizar a URL
+            return res.status(200).json({ received: true, ignored: true, reason: 'No externalReference' });
         }
 
         try {
