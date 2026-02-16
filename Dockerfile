@@ -37,5 +37,8 @@ ENV NODE_ENV=production
 # Expor porta
 EXPOSE 3000
 
+# Garantir que o tsx esteja disponível globalmente
+RUN npm install -g tsx
+
 # Comando para iniciar
 CMD ["npm", "start"]
