@@ -76,12 +76,17 @@ export const createCheckout = async (req: Request, res: Response) => {
         const billingType = req.body.billingType || "UNDEFINED";
         const cardData = req.body.cardData;
 
+        // MANUAL DATE FORMATTING (Safety)
+        const today = new Date();
+        // Ajuste para fuso horário de Brasília (UTC-3)
+        today.setHours(today.getHours() - 3);
+        const todayStr = today.toISOString().split('T')[0];
+
         const subPayload: any = {
             customer: customerId,
             billingType: billingType,
             value: Number(price),
-            // BUG FIX: Usa explicitamente o fuso de Brasília para evitar que às 21h (00h UTC) o vencimento pule para amanhã
-            nextDueDate: new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' }),
+            nextDueDate: todayStr, // Força a data de hoje formatada manualmente
             cycle: "MONTHLY",
             description: title,
             externalReference: `${userId}:${planId}`
@@ -128,16 +133,36 @@ export const createCheckout = async (req: Request, res: Response) => {
             return res.status(400).json({ error: `Erro ao criar assinatura: ${subData.errors[0].description}` });
         }
 
-        // 3. Buscar o Link de Pagamento e dados de PIX
+        // 3. Buscar o Link de Pagamento e checar data de vencimento
         const paymentsRes = await fetch(`${ASAAS_URL}/subscriptions/${subData.id}/payments`, { headers });
         const paymentsData: any = await paymentsRes.json();
 
-        // Determinar status inicial (se já pagou no cartão, ativa agora!)
         let initialStatus = 'pending';
         let firstPayment = null;
 
         if (paymentsData.data && paymentsData.data.length > 0) {
             firstPayment = paymentsData.data[0];
+
+            // SAFETY CHECK: Se a data de vencimento ficou para o mês que vem, force para hoje
+            if (firstPayment.dueDate !== todayStr) {
+                console.log(`[Checkout Alert] Pagamento ${firstPayment.id} gerado com vencimento em ${firstPayment.dueDate}. Forçando para hoje (${todayStr})...`);
+
+                try {
+                    await fetch(`${ASAAS_URL}/payments/${firstPayment.id}`, {
+                        method: 'POST', // Update no Asaas é POST
+                        headers,
+                        body: JSON.stringify({ dueDate: todayStr })
+                    });
+
+                    // Re-busca os dados atualizados
+                    const updatedPaymentRes = await fetch(`${ASAAS_URL}/payments/${firstPayment.id}`, { headers });
+                    firstPayment = await updatedPaymentRes.json();
+                    console.log(`[Checkout Fix] Vencimento atualizado para ${firstPayment.dueDate}. Status: ${firstPayment.status}`);
+                } catch (updateErr) {
+                    console.error('[Checkout Fix Error] Falha ao atualizar vencimento:', updateErr);
+                }
+            }
+
             const confirmedStatus = ['RECEIVED', 'CONFIRMED', 'RECEIVED_IN_CASH'];
             if (confirmedStatus.includes(firstPayment.status)) {
                 initialStatus = 'active';
@@ -164,7 +189,7 @@ export const createCheckout = async (req: Request, res: Response) => {
                 subData.id,
                 initialStatus,
                 tempBarcode,
-                subData.nextDueDate,
+                todayStr, // Usa a data corrigida
                 startDate.toISOString(),
                 endDate.toISOString()
             ]);
