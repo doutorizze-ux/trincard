@@ -237,25 +237,37 @@ export const getUserPayments = async (req: Request, res: Response) => {
 
 export const emergencyFixDates = async (req: Request, res: Response) => {
     try {
-        console.log('--- Iniciando Correção Emergencial de Datas ---');
+        console.log('--- Iniciando Correção Emergencial de Datas (V2) ---');
 
-        // Identificar assinaturas criadas nos últimos 2 dias que vencem em menos de 2 dias de criadas
-        const result = await pool.query(`
-            SELECT s.id, p.name as plan_name, s.created_at
+        const { force_all } = req.query;
+
+        // Busca assinaturas ativas. 
+        // Se force_all=true, busca todas. 
+        // Se não, busca apenas as que vencem na mesma data de criação ou antes (o bug óbvio)
+        let queryStr = `
+            SELECT s.id, p.name as plan_name, s.created_at, s.due_date, u.email
             FROM subscriptions s
             JOIN plans p ON s.plan_id = p.id
+            JOIN users u ON s.user_id = u.id
             WHERE s.status = 'active'
-            AND s.due_date <= s.created_at + interval '2 days'
-            AND s.created_at >= NOW() - interval '2 days'
-        `);
+        `;
 
-        let updatedCount = 0;
+        if (force_all !== 'true') {
+            queryStr += ` AND (s.due_date::date <= s.created_at::date + interval '1 day')`;
+        }
+
+        const result = await pool.query(queryStr);
+
+        const reports = [];
         for (const sub of result.rows) {
             let durationDays = 30;
             const name = (sub.plan_name || '').toLowerCase();
+
+            // Lógica de duração baseada no nome do plano
             if (name.includes('anual')) durationDays = 365;
             else if (name.includes('semestral')) durationDays = 180;
             else if (name.includes('trimestral')) durationDays = 90;
+            else if (name.includes('mensal')) durationDays = 30;
 
             const startDate = new Date(sub.created_at);
             const endDate = new Date(startDate);
@@ -268,14 +280,19 @@ export const emergencyFixDates = async (req: Request, res: Response) => {
                 WHERE id = $2
             `, [endDateIso, sub.id]);
 
-            updatedCount++;
+            reports.push({
+                email: sub.email,
+                plano: sub.plan_name,
+                criado_em: sub.created_at,
+                vencimento_antigo: sub.due_date,
+                vencimento_corrigido: endDateIso
+            });
         }
 
         res.json({
             success: true,
-            message: `Processado com sucesso. ${updatedCount} assinaturas corrigidas.`,
-            found: result.rows.length,
-            updated: updatedCount
+            message: `Processado. ${reports.length} assinaturas verificadas/corrigidas.`,
+            details: reports
         });
     } catch (error: any) {
         console.error('Erro na correção emergencial:', error);
