@@ -234,3 +234,51 @@ export const getUserPayments = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Erro ao buscar faturas' });
     }
 };
+
+export const emergencyFixDates = async (req: Request, res: Response) => {
+    try {
+        console.log('--- Iniciando Correção Emergencial de Datas ---');
+
+        // Identificar assinaturas criadas nos últimos 2 dias que vencem em menos de 2 dias de criadas
+        const result = await pool.query(`
+            SELECT s.id, p.name as plan_name, s.created_at
+            FROM subscriptions s
+            JOIN plans p ON s.plan_id = p.id
+            WHERE s.status = 'active'
+            AND s.due_date <= s.created_at + interval '2 days'
+            AND s.created_at >= NOW() - interval '2 days'
+        `);
+
+        let updatedCount = 0;
+        for (const sub of result.rows) {
+            let durationDays = 30;
+            const name = (sub.plan_name || '').toLowerCase();
+            if (name.includes('anual')) durationDays = 365;
+            else if (name.includes('semestral')) durationDays = 180;
+            else if (name.includes('trimestral')) durationDays = 90;
+
+            const startDate = new Date(sub.created_at);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + durationDays);
+            const endDateIso = endDate.toISOString();
+
+            await pool.query(`
+                UPDATE subscriptions 
+                SET due_date = $1, end_date = $1, updated_at = NOW()
+                WHERE id = $2
+            `, [endDateIso, sub.id]);
+
+            updatedCount++;
+        }
+
+        res.json({
+            success: true,
+            message: `Processado com sucesso. ${updatedCount} assinaturas corrigidas.`,
+            found: result.rows.length,
+            updated: updatedCount
+        });
+    } catch (error: any) {
+        console.error('Erro na correção emergencial:', error);
+        res.status(500).json({ error: 'Erro interno ao corrigir datas', details: error.message });
+    }
+};

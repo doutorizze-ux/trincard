@@ -76,11 +76,8 @@ export const createCheckout = async (req: Request, res: Response) => {
         const billingType = req.body.billingType || "UNDEFINED";
         const cardData = req.body.cardData;
 
-        // MANUAL DATE FORMATTING (Safety)
-        const today = new Date();
-        // Ajuste para fuso horário de Brasília (UTC-3)
-        today.setHours(today.getHours() - 3);
-        const todayStr = today.toISOString().split('T')[0];
+        // MANUAL DATE FORMATTING (Safety) - Usa fuso de Brasília para o vencimento inicial no Asaas
+        const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 
         const subPayload: any = {
             customer: customerId,
@@ -175,8 +172,20 @@ export const createCheckout = async (req: Request, res: Response) => {
 
             // Datas para o registro local
             const startDate = new Date();
-            const endDate = new Date();
-            endDate.setDate(startDate.getDate() + 30); // Default 30 dias, webhook ajustará se for anual
+
+            // Determinar duração para o registro inicial (evita mostrar 30 dias para plano anual)
+            let durationDays = 30;
+            const planTitleLower = title?.toLowerCase() || '';
+            if (planTitleLower.includes('anual')) {
+                durationDays = 365;
+            } else if (planTitleLower.includes('semestral')) {
+                durationDays = 180;
+            } else if (planTitleLower.includes('trimestral')) {
+                durationDays = 90;
+            }
+
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + durationDays);
 
             const subResult = await pool.query(`
                 INSERT INTO subscriptions (
@@ -189,7 +198,7 @@ export const createCheckout = async (req: Request, res: Response) => {
                 subData.id,
                 initialStatus,
                 tempBarcode,
-                todayStr, // Usa a data corrigida
+                endDate.toISOString(), // Ajustado: due_date local representa o fim do período (renovação)
                 startDate.toISOString(),
                 endDate.toISOString()
             ]);
