@@ -12,7 +12,8 @@ import {
   ChevronDown,
   Heart,
   Share2,
-  ExternalLink
+  ExternalLink,
+  CheckCircle
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { Partner } from '../lib/supabase';
@@ -373,8 +374,9 @@ export default function PartnersPage() {
 
                     <div className="mb-10 bg-gradient-to-r from-[#FF3131]/10 to-transparent border-l-4 border-[#FF3131] p-5 rounded-r-2xl">
                       <h4 className="text-[10px] font-black text-[#FF3131] uppercase tracking-[0.2em] mb-2 uppercase italic leading-none">Vantagem Exclusiva:</h4>
-                      <p className="text-white font-black italic tracking-tighter text-lg leading-tight">
-                        🎯 DESCONTO DE 15% EM PERFORMANCE
+                      <p className="text-white font-black italic tracking-tighter text-lg leading-tight flex items-center">
+                        <CheckCircle className="h-5 w-5 mr-2 text-white fill-white/20" />
+                        DESCONTO DE {partner.percentage || 0}% EM PERFORMANCE
                       </p>
                     </div>
 
@@ -424,9 +426,14 @@ export default function PartnersPage() {
                 <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase leading-none mb-2">
                   {selectedPartner.company_name || selectedPartner.name}
                 </h2>
-                <span className="inline-block px-3 py-1 bg-[#FF3131] text-black text-[10px] font-black uppercase tracking-widest rounded-lg mb-6">
-                  {selectedPartner.category}
-                </span>
+                <div className="flex items-center space-x-3 mb-6">
+                  <span className="inline-block px-3 py-1 bg-[#FF3131] text-black text-[10px] font-black uppercase tracking-widest rounded-lg">
+                    {selectedPartner.category}
+                  </span>
+                  <span className="inline-block px-3 py-1 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-lg">
+                    {selectedPartner.percentage || 0}% OFF
+                  </span>
+                </div>
 
                 <div className="space-y-6">
                   <div>
